@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TANO Auto Scan Italia</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #07080f; color: #e8eaf6; font-family: Arial, sans-serif; }
+
+header {
+  background: #0d0f1e; border-bottom: 2px solid #00d4ff33;
+  padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+}
+.logo { font-size: 22px; font-weight: 900; color: #00d4ff; }
+.logo span { font-size: 11px; display: block; color: #4a5580; font-weight: 400; }
+
+nav { display: flex; background: #090b19; border-bottom: 1px solid #1f2845; overflow-x: auto; }
+nav button {
+  flex: 1; min-width: 80px; padding: 13px 8px;
+  background: none; border: none; border-bottom: 3px solid transparent;
+  color: #4a5580; cursor: pointer; font-size: 13px; font-weight: 700;
+  white-space: nowrap;
+}
+nav button.on { color: #00d4ff; border-bottom-color: #00d4ff; }
+
+.page { display: none; padding: 14px; }
+.page.on { display: block; }
+
+.card { background: #0d0f1e; border: 1px solid #1f2845; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+.lbl { font-size: 10px; color: #4a5580; letter-spacing: .12em; display: block; margin-bottom: 4px; font-family: monospace; }
+
+/* ─── ZONE PHOTO ─── */
+#preview-zone {
+  background: #0d0f1e; border: 2px dashed #1f2845; border-radius: 12px;
+  min-height: 160px; display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 8px; margin-bottom: 12px; overflow: hidden;
+  position: relative;
+}
+#preview-zone img { max-height: 200px; max-width: 100%; border-radius: 10px; }
+#preview-zone .hint { color: #4a5580; font-size: 13px; }
+#preview-zone .hint .ico { font-size: 34px; display: block; margin-bottom: 4px; }
+#clear-btn {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(0,0,0,.85); border: 1px solid #333;
+  border-radius: 8px; color: #aaa; cursor: pointer;
+  padding: 4px 10px; font-size: 12px;
+}
+
+/* ─── BOUTONS FICHIER NATIFS ─── */
+.file-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+
+/* 
+  CES INPUTS SONT INTENTIONNELLEMENT VISIBLES ET NATIFS.
+  C'est la seule méthode garantie sur Samsung Android Chrome.
+  On leur donne juste une grande hauteur et une couleur de fond.
+*/
+input[type=file] {
+  display: block;
+  width: 100%;
+  height: 80px;
+  opacity: 1;
+  cursor: pointer;
+  border-radius: 12px;
+  border: 2px solid #1f2845;
+  background: #131629;
+  color: transparent; /* cache le texte natif moche */
+  font-size: 0; /* cache le texte */
+}
+input[type=file]::file-selector-button {
+  display: none; /* cache le bouton natif interne */
+}
+
+/* On superpose une div décorative PAR-DESSOUS via relative/absolute */
+.file-wrap { position: relative; border-radius: 12px; overflow: visible; }
+.file-deco {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 12px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px;
+  pointer-events: none; /* laisse passer les clics vers l'input */
+  z-index: 0;
+}
+.file-wrap input[type=file] {
+  position: relative; z-index: 1;
+  background: transparent;
+}
+.file-wrap.cam .file-deco {
+  background: linear-gradient(135deg,#003d52,#005f7a);
+  border: 2px solid #00d4ff;
+  box-shadow: 0 0 14px #00d4ff22;
+}
+.file-wrap.gal .file-deco {
+  background: #131629;
+  border: 2px solid #1f2845;
+}
+.file-deco .ico2 { font-size: 28px; }
+.file-deco .txt2 { font-size: 15px; font-weight: 800; letter-spacing: .06em; }
+.file-wrap.cam .file-deco .txt2 { color: #00d4ff; }
+.file-wrap.gal .file-deco .txt2 { color: #7986b0; }
+
+/* ─── BOUTON ANALIZZA ─── */
+#btn-analizza {
+  display: block; width: 100%; padding: 15px;
+  background: linear-gradient(135deg,#1d4ed8,#3b82f6);
+  color: #fff; border: none; border-radius: 12px;
+  font-size: 17px; font-weight: 900; cursor: pointer;
+  letter-spacing: .06em; margin-bottom: 12px;
+  opacity: .4;
+}
+#btn-analizza.ready { opacity: 1; box-shadow: 0 0 18px #3b82f633; }
+
+/* ─── RICERCA MANUALE ─── */
+.search-row { display: flex; gap: 8px; }
+.search-row input {
+  flex: 1; background: #07080f; border: 1px solid #1f2845;
+  border-radius: 8px; padding: 12px; color: #e8eaf6;
+  font-size: 18px; font-weight: 900; text-align: center;
+  letter-spacing: .2em; font-family: monospace; outline: none;
+}
+.search-row button {
+  background: #131629; border: 1px solid #1f2845;
+  border-radius: 8px; color: #7986b0; cursor: pointer;
+  padding: 12px 14px; font-size: 18px;
+}
+
+/* ─── TARGA VISUALE ─── */
+.plate-wrap {
+  display: inline-flex; align-items: stretch;
+  border-radius: 8px; border: 2.5px solid #7a5c00;
+  overflow: hidden; box-shadow: 0 4px 20px #f5c84233;
+  margin-bottom: 14px;
+}
+.plate-eu {
+  background: #009246; width: 26px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1px; padding: 4px 2px;
+}
+.plate-eu span { color: #fff; font-size: 6px; font-weight: 900; font-family: monospace; }
+.plate-eu .star { color: #f5c842; font-size: 8px; }
+.plate-num {
+  background: #f5c842; padding: 8px 14px;
+  font-family: monospace; font-size: 24px; font-weight: 900;
+  color: #111; letter-spacing: .15em;
+}
+
+/* ─── TECH GRID ─── */
+.tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #1f2845; border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+.tc { background: #0d0f1e; padding: 10px 12px; }
+.tc.full { grid-column: 1/-1; }
+.tc-k { font-family: monospace; font-size: 9px; color: #4a5580; letter-spacing: .12em; margin-bottom: 2px; }
+.tc-v { font-size: 14px; font-weight: 700; color: #e8eaf6; }
+.tc-v.hi { color: #00d4ff; }
+
+/* ─── STATUS BADGE ─── */
+.badge { display: inline-block; font-family: monospace; font-size: 11px; padding: 3px 9px; border-radius: 20px; border: 1px solid; letter-spacing: .07em; }
+
+/* ─── BOTTONI AZIONE ─── */
+.btn { display: block; width: 100%; padding: 13px; border-radius: 10px; border: none;
+  font-size: 16px; font-weight: 800; cursor: pointer; letter-spacing: .05em; margin-bottom: 8px; text-align: center; }
+.btn-wa { background: linear-gradient(135deg,#075e54,#128c7e); color: #fff; }
+.btn-copy { background: #131629; border: 1px solid #1f2845 !important; color: #7986b0; }
+.btn-add-db { background: linear-gradient(135deg,#1d4ed8,#3b82f6); color: #fff; }
+.btn-add-v { background: linear-gradient(135deg,#1d4ed8,#3b82f6); color: #fff; }
+.btn-save { background: #052e16; color: #00e676; border: 1px solid #00e67633 !important; }
+.btn-cancel { background: transparent; color: #4a5580; border: 1px solid #1f2845 !important; }
+
+/* ─── DB ROW ─── */
+.db-row { background: #0d0f1e; border: 1px solid #1f2845; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; gap: 10px; }
+.db-plate { font-family: monospace; font-size: 14px; font-weight: 900; color: #f5c842; min-width: 85px; }
+.db-body { flex: 1; }
+.db-name { font-size: 14px; font-weight: 700; }
+.db-sub { font-family: monospace; font-size: 11px; color: #4a5580; }
+.db-acts { display: flex; flex-direction: column; gap: 4px; }
+.db-acts button { background: none; border: 1px solid #1f2845; border-radius: 6px; cursor: pointer; padding: 4px 8px; font-size: 13px; }
+
+/* ─── DASH ─── */
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.dc { background: #0d0f1e; border: 1px solid #1f2845; border-radius: 12px; padding: 12px; text-align: center; }
+.dc-n { font-size: 30px; font-weight: 900; line-height: 1; }
+.dc-l { font-family: monospace; font-size: 9px; color: #4a5580; letter-spacing: .1em; margin-top: 3px; }
+
+/* ─── FORM GRID ─── */
+.fg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+.fg2 input, .fg2 select, input.fi, select.fi {
+  background: #07080f; border: 1px solid #1f2845; border-radius: 8px;
+  padding: 10px 10px; color: #e8eaf6; font-size: 13px; font-family: monospace;
+  outline: none; width: 100%; margin-bottom: 6px;
+}
+
+/* ─── MSG ─── */
+.msg-ok { color: #00e676; font-family: monospace; font-size: 12px; padding: 8px; }
+.msg-err { color: #ff3d5a; font-family: monospace; font-size: 12px; padding: 8px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { display: inline-block; animation: spin .7s linear infinite; }
+@keyframes fi { from { opacity:0; transform: translateY(6px); } to { opacity:1; } }
+.fi-anim { animation: fi .3s ease; }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="font-size:26px">🚗</div>
+  <div>
+    <div class="logo">TANO Auto Scan <span>SISTEMA DI LETTURA TARGHE ITALIA • v4.0</span></div>
+  </div>
+  <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+    <div style="font-family:monospace;font-size:10px;color:#7986b0;background:#131629;border:1px solid #1f2845;border-radius:20px;padding:3px 10px;">DB <span id="hdr-db" style="color:#00d4ff;font-weight:900">5</span></div>
+    <div style="font-family:monospace;font-size:10px;color:#7986b0;background:#131629;border:1px solid #1f2845;border-radius:20px;padding:3px 10px;">SCAN <span id="hdr-scan" style="color:#00d4ff;font-weight:900">0</span></div>
+  </div>
+</header>
+
+<!-- MODAL API KEY (non usato, rimosso) -->
+
+<nav>
+  <button class="on" onclick="go('scanner',this)">📷 SCANNER</button>
+  <button onclick="go('dashboard',this)">📊 DASH</button>
+  <button onclick="go('database',this)">🗄️ DATABASE</button>
+  <button onclick="go('add',this)">➕ AGGIUNGI</button>
+</nav>
+
+<!-- ══ SCANNER ══ -->
+<div id="pg-scanner" class="page on">
+
+  <div id="preview-zone">
+    <div class="hint"><span class="ico">📷</span>Nessuna foto selezionata</div>
+  </div>
+
+  <div class="file-btns">
+    <!-- FOTOCAMERA -->
+    <div class="file-wrap cam">
+      <div class="file-deco">
+        <span class="ico2">📸</span>
+        <span class="txt2">FOTOCAMERA</span>
+      </div>
+      <input type="file" accept="image/*" capture="environment" id="inp-cam" onchange="gotFile(this)"/>
+    </div>
+    <!-- GALLERIA -->
+    <div class="file-wrap gal">
+      <div class="file-deco">
+        <span class="ico2">🖼️</span>
+        <span class="txt2">GALLERIA</span>
+      </div>
+      <input type="file" accept="image/*" id="inp-gal" onchange="gotFile(this)"/>
+    </div>
+  </div>
+
+  <button id="btn-analizza" onclick="doScan()">🔍 ANALIZZA TARGA</button>
+
+  <div class="card">
+    <span class="lbl">🔠 RICERCA MANUALE</span>
+    <div class="search-row">
+      <input id="inp-manual" type="text" placeholder="Es: FA036BV" maxlength="8"
+        oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
+        onkeydown="if(event.key==='Enter')doManual()"/>
+      <button onclick="doManual()">🔍</button>
+    </div>
+  </div>
+
+  <div id="result-area"></div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="pg-dashboard" class="page">
+  <div class="dash-grid">
+    <div class="dc"><div class="dc-n" style="color:#00d4ff" id="d-tot">5</div><div class="dc-l">TARGHE</div></div>
+    <div class="dc"><div class="dc-n" style="color:#00e676" id="d-ok">3</div><div class="dc-l">REGOLARI</div></div>
+    <div class="dc"><div class="dc-n" style="color:#ff3d5a" id="d-al">2</div><div class="dc-l">ALLERTE</div></div>
+  </div>
+  <div class="card">
+    <span class="lbl">🕐 SCANSIONI RECENTI</span>
+    <div id="d-hist"><span style="color:#4a5580;font-family:monospace;font-size:12px">Nessuna scansione ancora.</span></div>
+  </div>
+  <div class="card">
+    <span class="lbl">⚠️ VEICOLI IN ALLERTA</span>
+    <div id="d-alert"></div>
+  </div>
+</div>
+
+<!-- ══ DATABASE ══ -->
+<div id="pg-database" class="page">
+  <input type="text" class="fi" id="db-search" placeholder="🔍  Cerca targa, proprietario, marca..." oninput="renderDB()" style="margin-bottom:12px"/>
+  <div id="db-list"></div>
+</div>
+
+<!-- ══ AGGIUNGI ══ -->
+<div id="pg-add" class="page">
+  <div class="card">
+    <span class="lbl" style="margin-bottom:10px;font-size:11px">🚗 NUOVO VEICOLO</span>
+    <div class="fg2">
+      <div><span class="lbl">TARGA *</span><input class="fi" id="a-plate" placeholder="EJ024ZK" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"/></div>
+      <div><span class="lbl">PROPRIETARIO *</span><input class="fi" id="a-owner" placeholder="Mario Rossi"/></div>
+      <div><span class="lbl">TELEFONO</span><input class="fi" id="a-phone" placeholder="+39 333 000 0000"/></div>
+      <div><span class="lbl">MARCA</span><input class="fi" id="a-brand" placeholder="Fiat"/></div>
+      <div><span class="lbl">MODELLO</span><input class="fi" id="a-model" placeholder="500 1.2 Pop"/></div>
+      <div><span class="lbl">ANNO</span><input class="fi" id="a-year" placeholder="2020" value="2024"/></div>
+      <div><span class="lbl">COLORE</span><input class="fi" id="a-color" placeholder="Bianco"/></div>
+      <div><span class="lbl">CAVALLI</span><input class="fi" id="a-hp" placeholder="69"/></div>
+      <div><span class="lbl">CILINDRATA</span><input class="fi" id="a-cc" placeholder="1242cc"/></div>
+      <div>
+        <span class="lbl">CARBURANTE</span>
+        <select class="fi" id="a-fuel">
+          <option>Benzina</option><option>Diesel</option>
+          <option>Ibrido</option><option>Elettrico</option>
+          <option>GPL</option><option>Metano</option>
+        </select>
+      </div>
+      <div>
+        <span class="lbl">STATO</span>
+        <select class="fi" id="a-status">
+          <option value="ok">✓ Regolare</option>
+          <option value="wanted">🔴 Ricercato</option>
+          <option value="expired">⏱ Scaduta</option>
+          <option value="stolen">🚨 Rubato</option>
+        </select>
+      </div>
+    </div>
+    <span class="lbl">OLIO MOTORE</span><input class="fi" id="a-oil" placeholder="5W-30 (4.5L)" style="margin-bottom:6px"/>
+    <span class="lbl">BATTERIA</span><input class="fi" id="a-battery" placeholder="60Ah 540A EN" style="margin-bottom:6px"/>
+    <span class="lbl">PNEUMATICI</span><input class="fi" id="a-tires" placeholder="205/55 R16 91V" style="margin-bottom:6px"/>
+    <span class="lbl">PROSSIMA REVISIONE</span><input type="date" class="fi" id="a-rev" style="margin-bottom:6px"/>
+    <span class="lbl">NOTE</span><input class="fi" id="a-note" placeholder="..." style="margin-bottom:10px"/>
+    <div id="add-msg"></div>
+    <button class="btn btn-add-v" onclick="doAdd()">➕ AGGIUNGI VEICOLO</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DATABASE
+// ══════════════════════════════════════════════════════════
+var db = [
+  {id:1,plate:"EJ024ZK",owner:"Giuseppe Marino",phone:"+39 333 100 2000",brand:"Lancia",model:"Thesis 2.4 JTD 140CV",year:2003,color:"Bianco Perla",fuel:"Diesel",hp:"140",cc:"2387cc",oil:"FIAT 9.55535-H2 · 5W-40 (6.5L)",battery:"72Ah 680A EN · 278x175x190mm",tires:"215/55 R16 97H",revision:"2025-08-15",status:"ok",note:""},
+  {id:2,plate:"AB123CD",owner:"Mario Rossi",phone:"+39 333 111 2222",brand:"Fiat",model:"500 1.2 69CV Pop",year:2018,color:"Bianco Gelato",fuel:"Benzina",hp:"69",cc:"1242cc",oil:"FIAT 9.55535-S1 · 5W-40 (3.8L)",battery:"44Ah 360A EN · 175x175x190mm",tires:"185/65 R15 88T",revision:"2025-06-01",status:"ok",note:""},
+  {id:3,plate:"EF456GH",owner:"Giulia Bianchi",phone:"+39 347 222 3333",brand:"Alfa Romeo",model:"Giulietta 1.6 JTDm 105CV",year:2016,color:"Rosso Alfa",fuel:"Diesel",hp:"105",cc:"1598cc",oil:"SELENIA WR · 5W-30 (4.5L)",battery:"60Ah 540A EN",tires:"205/55 R16 91V",revision:"2024-11-15",status:"expired",note:"Revisione scaduta"},
+  {id:4,plate:"IJ789KL",owner:"Luca Ferrari",phone:"+39 328 333 4444",brand:"Lancia",model:"Delta Integrale HF",year:1991,color:"Blu Metallizzato",fuel:"Benzina",hp:"210",cc:"1765cc",oil:"CASTROL 10W-60 (4L)",battery:"55Ah 420A EN",tires:"205/50 R15 86V",revision:"2025-03-20",status:"wanted",note:"Veicolo segnalato rubato"},
+  {id:5,plate:"MN012OP",owner:"Sofia Conti",phone:"+39 366 444 5555",brand:"BMW",model:"Serie 1 118d 143CV",year:2020,color:"Nero Zaffiro",fuel:"Diesel",hp:"143",cc:"1995cc",oil:"BMW LL-04 · 5W-30 (4.25L)",battery:"70Ah 640A EN",tires:"205/55 R16 91H",revision:"2026-02-10",status:"ok",note:""},
+];
+var nextId = 6;
+var scanCount = 0;
+var history = [];
+
+var ST = {
+  ok:      {label:"Regolare",          color:"#00e676",bg:"#00e67614",border:"#00e67633"},
+  wanted:  {label:"Ricercato",         color:"#ff3d5a",bg:"#ff3d5a14",border:"#ff3d5a33"},
+  expired: {label:"Revisione Scaduta", color:"#ffab00",bg:"#ffab0014",border:"#ffab0033"},
+  stolen:  {label:"Rubato",            color:"#ff3d5a",bg:"#ff3d5a1a",border:"#ff3d5a44"},
+  unknown: {label:"Non Registrato",    color:"#7986b0",bg:"#7986b010",border:"#7986b030"},
+};
+
+function stIcon(s){return {ok:"✅",wanted:"🔴",expired:"⏱️",stolen:"🚨"}[s]||"❓";}
+function norm(s){return (s||"").replace(/[\s\-.]/g,"").toUpperCase();}
+function stCfg(s){return ST[s]||ST.unknown;}
+
+// ══════════════════════════════════════════════════════════
+// NAVIGAZIONE
+// ══════════════════════════════════════════════════════════
+function go(pg, btn){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('nav button').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('pg-'+pg).classList.add('on');
+  btn.classList.add('on');
+  if(pg==='database') renderDB();
+  if(pg==='dashboard') renderDash();
+}
+
+// ══════════════════════════════════════════════════════════
+// GESTIONE FILE — approccio più semplice possibile
+// ══════════════════════════════════════════════════════════
+var curB64 = null, curMime = null;
+
+function gotFile(input){
+  // Polling: controlla il file ogni 100ms fino a 3 secondi
+  var tries = 0;
+  var poll = setInterval(function(){
+    tries++;
+    var file = input.files && input.files[0];
+    if(file){
+      clearInterval(poll);
+      readFile(file);
+    } else if(tries > 30){
+      clearInterval(poll);
+    }
+  }, 100);
+}
+
+function readFile(file){
+  if(!file.type.startsWith('image/')) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    var dataUrl = ev.target.result;
+    curB64  = dataUrl.split(',')[1];
+    curMime = file.type;
+    var z = document.getElementById('preview-zone');
+    z.innerHTML = '<img src="'+dataUrl+'"/><button class="clear-btn" onclick="clearImg()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.85);border:1px solid #333;border-radius:8px;color:#aaa;cursor:pointer;padding:4px 10px;font-size:12px;">✕ Cambia</button>';
+    document.getElementById('btn-analizza').classList.add('ready');
+    document.getElementById('result-area').innerHTML = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImg(){
+  curB64=null; curMime=null;
+  document.getElementById('preview-zone').innerHTML = '<div class="hint"><span class="ico">📷</span>Nessuna foto selezionata</div>';
+  document.getElementById('btn-analizza').classList.remove('ready');
+  document.getElementById('inp-cam').value='';
+  document.getElementById('inp-gal').value='';
+  document.getElementById('result-area').innerHTML='';
+}
+
+// ══════════════════════════════════════════════════════════
+// SCAN AI
+// ══════════════════════════════════════════════════════════
+async function doScan(){
+  if(!curB64){alert('Prima seleziona una foto!'); return;}
+
+  var btn = document.getElementById('btn-analizza');
+  btn.innerHTML = '<span class="spin">◌</span> ANALISI IN CORSO...';
+  btn.disabled = true;
+  document.getElementById('result-area').innerHTML = '';
+
+  try {
+    // Carica immagine originale
+    var img = new Image();
+    await new Promise(function(r){ img.onload=r; img.src='data:'+curMime+';base64,'+curB64; });
+
+    // Ridimensiona a max 1200px sul lato più lungo — sufficiente per leggere una targa
+    // Netlify Functions ha limite 6MB, le foto Samsung sono 8-15MB
+    var canvas = document.createElement('canvas');
+    var maxSide = 1200;
+    var ratio = Math.min(1, maxSide / Math.max(img.width, img.height));
+    canvas.width  = Math.round(img.width  * ratio);
+    canvas.height = Math.round(img.height * ratio);
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    // Qualità 0.90 — ottima nitidezza, dimensione controllata
+    var compressed = canvas.toDataURL('image/jpeg', 0.90);
+    var b64 = compressed.split(',')[1];
+
+    // Verifica dimensione finale (deve essere sotto 4MB in base64)
+    if(b64.length > 4000000){
+      // Seconda compressione se ancora troppo grande
+      canvas.width  = Math.round(canvas.width  * 0.7);
+      canvas.height = Math.round(canvas.height * 0.7);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      b64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+    }
+
+    var payload = {
+      image_base64: b64,
+      image_mime: 'image/jpeg'
+    };
+
+    var res = await fetch('/api/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      var errText = await res.text();
+      throw new Error('Errore server: ' + res.status);
+    }
+
+    var data = await res.json();
+
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    var plate = (data.plate || 'NESSUNA_TARGA').replace(/[^A-Z0-9]/g, '');
+
+    scanCount++;
+    document.getElementById('hdr-scan').textContent = scanCount;
+    var match = db.find(function(r){return norm(r.plate)===norm(plate);}) || null;
+    if(plate!=='NESSUNA_TARGA') history.unshift({plate:plate,match:match,time:new Date()});
+    showResult(plate, match);
+
+  }catch(e){
+    document.getElementById('result-area').innerHTML =
+      '<div class="card" style="color:#ff3d5a">❌ Errore: '+e.message+'<br><br>'
+      +'<button onclick="doScan()" style="background:#3b82f622;border:1px solid #3b82f644;'
+      +'border-radius:6px;color:#60a5fa;cursor:pointer;padding:8px 14px;font-size:14px;">'
+      +'↺ Riprova</button></div>';
+  }
+
+  btn.innerHTML = '🔍 ANALIZZA TARGA';
+  btn.disabled = false;
+}
+
+function getKey(){
+  // Chiave API — sostituisci con la tua da console.anthropic.com
+  return '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';
+}
+
+// ══════════════════════════════════════════════════════════
+// RICERCA MANUALE
+// ══════════════════════════════════════════════════════════
+function doManual(){
+  var p = document.getElementById('inp-manual').value.trim().toUpperCase().replace(/[\s\-.]/g,'');
+  if(!p) return;
+  var match = db.find(function(r){return norm(r.plate)===norm(p);})||null;
+  showResult(p, match);
+}
+
+// ══════════════════════════════════════════════════════════
+// MOSTRA RISULTATO
+// ══════════════════════════════════════════════════════════
+function showResult(plate, match){
+  var area = document.getElementById('result-area');
+  if(plate==='NESSUNA_TARGA'){
+    area.innerHTML='<div class="card fi-anim" style="color:#ffab00">⚠️ Nessuna targa rilevata. Riprova con foto più nitida.</div>';
+    return;
+  }
+  if(plate==='ERRORE'){
+    area.innerHTML='<div class="card fi-anim" style="color:#ff3d5a">❌ Errore. Verifica la connessione internet.</div>';
+    return;
+  }
+  var st = stCfg(match?match.status:'unknown');
+  var html = '<div class="card fi-anim">';
+  // Header targa
+  html += '<div class="plate-wrap"><div class="plate-eu"><span>EU</span><span class="star">★</span><span>I</span></div><div class="plate-num">'+plate+'</div></div>';
+  // Badge stato
+  html += '<div style="margin-bottom:10px"><span class="badge" style="color:'+st.color+';background:'+st.bg+';border-color:'+st.border+'">'+stIcon(match?match.status:'unknown')+' '+st.label+'</span></div>';
+  if(match){
+    var revHtml = '';
+    if(match.revision){
+      var diff=Math.round((new Date(match.revision)-new Date())/86400000);
+      var rc=diff<0?'#ff3d5a':diff<90?'#ffab00':'#00e676';
+      var rm=diff<0?'Scaduta da '+(-diff)+' giorni':diff===0?'Scade oggi':diff<90?'Scade tra '+diff+' giorni':new Date(match.revision).toLocaleDateString('it-IT');
+      revHtml='<div class="tc full"><div class="tc-k">📅 REVISIONE</div><div class="tc-v" style="color:'+rc+'">'+rm+'</div></div>';
+    }
+    html += '<div class="tech-grid">'
+      +'<div class="tc"><div class="tc-k">🏭 MARCA</div><div class="tc-v hi">'+match.brand+'</div></div>'
+      +'<div class="tc"><div class="tc-k">🚗 MODELLO</div><div class="tc-v">'+match.model+'</div></div>'
+      +'<div class="tc"><div class="tc-k">📅 ANNO</div><div class="tc-v">'+match.year+'</div></div>'
+      +'<div class="tc"><div class="tc-k">🎨 COLORE</div><div class="tc-v">'+match.color+'</div></div>'
+      +'<div class="tc"><div class="tc-k">⛽ CARBURANTE</div><div class="tc-v">'+match.fuel+'</div></div>'
+      +'<div class="tc"><div class="tc-k">⚡ POTENZA</div><div class="tc-v">'+match.hp+' CV · '+match.cc+'</div></div>'
+      +'<div class="tc full"><div class="tc-k">🛢️ OLIO MOTORE</div><div class="tc-v hi">'+match.oil+'</div></div>'
+      +'<div class="tc full"><div class="tc-k">🔋 BATTERIA</div><div class="tc-v hi">'+match.battery+'</div></div>'
+      +'<div class="tc full"><div class="tc-k">🔄 PNEUMATICI</div><div class="tc-v">'+match.tires+'</div></div>'
+      +revHtml
+      +(match.note?'<div class="tc full"><div class="tc-k">📌 NOTE</div><div class="tc-v" style="color:'+st.color+'">'+match.note+'</div></div>':'')
+      +'</div>';
+    html += shareButtons(plate);
+  } else {
+    // Targa non nel DB locale — offri ricerca PRA + condivisione
+    html += '<div style="background:#0d0f1e;border:1px solid #1f2845;border-radius:10px;padding:14px;margin-bottom:10px;">'
+      +'<div style="font-family:monospace;font-size:11px;color:#4a5580;margin-bottom:10px;">TARGA NON NEL DATABASE LOCALE</div>'
+
+      // Pulsante PRA ufficiale
+      +'<a href="https://www.ilportaledellautomobilista.it/web/portale-automobilista/cerca-veicolo?targa='+plate+'" target="_blank" style="display:block;width:100%;padding:13px;background:linear-gradient(135deg,#1a3a6b,#2563eb);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:900;text-align:center;text-decoration:none;margin-bottom:8px;letter-spacing:.05em;">🏛️ Cerca sul Portale Automobilista</a>'
+
+      // Pulsante ACI
+      +'<a href="https://www.aci.it/i-servizi/servizi-online/visura-veicolo.html?targa='+plate+'" target="_blank" style="display:block;width:100%;padding:13px;background:linear-gradient(135deg,#7c1d1d,#dc2626);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:900;text-align:center;text-decoration:none;margin-bottom:8px;letter-spacing:.05em;">🔴 Cerca su ACI</a>'
+
+      +'<button class="btn btn-add-db" onclick="prefillAdd(\''+plate+'\')" style="margin-bottom:0">➕ Aggiungi al database locale</button>'
+      +'</div>';
+
+    // Condivisione anche per targhe non nel DB
+    html += shareButtons(plate);
+  }
+  html += '</div>';
+  area.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════
+// CONDIVISIONE — WhatsApp, Email, Telegram
+// ══════════════════════════════════════════════════════════
+function shareButtons(plate){
+  return '<div style="margin-top:10px;">'
+    +'<div style="font-family:monospace;font-size:10px;color:#4a5580;letter-spacing:.15em;margin-bottom:8px;">📤 CONDIVIDI</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">'
+
+    // WhatsApp
+    +'<button onclick="shareWA(\''+plate+'\')" style="'
+    +'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
+    +'padding:12px 6px;border-radius:12px;border:none;cursor:pointer;'
+    +'background:linear-gradient(135deg,#075e54,#25d366);color:#fff;font-weight:900;font-size:12px;">'
+    +'<span style="font-size:22px;">💬</span>WhatsApp</button>'
+
+    // Email
+    +'<button onclick="shareEmail(\''+plate+'\')" style="'
+    +'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
+    +'padding:12px 6px;border-radius:12px;border:none;cursor:pointer;'
+    +'background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;font-weight:900;font-size:12px;">'
+    +'<span style="font-size:22px;">📧</span>Email</button>'
+
+    // Telegram
+    +'<button onclick="shareTelegram(\''+plate+'\')" style="'
+    +'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
+    +'padding:12px 6px;border-radius:12px;border:none;cursor:pointer;'
+    +'background:linear-gradient(135deg,#006699,#0088cc);color:#fff;font-weight:900;font-size:12px;">'
+    +'<span style="font-size:22px;">✈️</span>Telegram</button>'
+
+    +'</div>'
+
+    // Copia tutto
+    +'<button onclick="copyInfo(\''+plate+'\')" style="'
+    +'display:block;width:100%;margin-top:8px;padding:11px;'
+    +'background:#131629;border:1px solid #1f2845;border-radius:10px;'
+    +'color:#7986b0;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.05em;">'
+    +'📋 Copia testo completo</button>'
+    +'</div>';
+}
+
+function buildMsg(plate){
+  var m=db.find(function(r){return norm(r.plate)===norm(plate);});
+  var now=new Date().toLocaleString('it-IT');
+  var header='🚗 *TANO Auto Scan Italia*\n📅 '+now+'\n\n🔍 Targa: *'+plate+'*\n';
+  if(!m) return header+'⚠️ Targa non presente nel database locale.\n\n🏛️ Verifica su: https://www.ilportaledellautomobilista.it';
+  var st=stCfg(m.status);
+  return header
+    +stIcon(m.status)+' Stato: '+st.label+'\n\n'
+    +'🏭 Marca: '+m.brand+'\n'
+    +'🚗 Modello: '+m.model+'\n'
+    +'📅 Anno: '+m.year+'\n'
+    +'🎨 Colore: '+m.color+'\n'
+    +'⛽ Carburante: '+m.fuel+'\n'
+    +'⚡ Potenza: '+m.hp+' CV · '+m.cc+'\n\n'
+    +'🛢️ Olio: '+m.oil+'\n'
+    +'🔋 Batteria: '+m.battery+'\n'
+    +'🔄 Pneumatici: '+m.tires+'\n'
+    +(m.revision?'📋 Revisione: '+new Date(m.revision).toLocaleDateString('it-IT')+'\n':'')
+    +(m.note?'📌 Note: '+m.note+'\n':'')
+    +'\n👤 Proprietario: '+m.owner
+    +(m.phone?'\n📞 '+m.phone:'');
+}
+
+function shareWA(plate){
+  var msg = buildMsg(plate);
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+function shareEmail(plate){
+  var msg = buildMsg(plate);
+  var subject = 'TANO Auto Scan — Targa: '+plate;
+  window.open('mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(msg),'_blank');
+}
+
+function shareTelegram(plate){
+  var msg = buildMsg(plate);
+  window.open('https://t.me/share/url?url=https://tano.netlify.app&text='+encodeURIComponent(msg),'_blank');
+}
+
+function copyInfo(plate){
+  var msg=buildMsg(plate);
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(msg).then(function(){alert('✅ Copiato negli appunti!');});
+  } else {
+    var ta=document.createElement('textarea');
+    ta.value=msg; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('✅ Copiato!');
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// DATABASE
+// ══════════════════════════════════════════════════════════
+function renderDB(){
+  var q=(document.getElementById('db-search').value||'').toLowerCase();
+  var list=document.getElementById('db-list');
+  var rows=db.filter(function(r){
+    return norm(r.plate).includes(norm(q))
+      ||(r.owner||'').toLowerCase().includes(q)
+      ||(r.brand||'').toLowerCase().includes(q);
+  });
+  if(!rows.length){list.innerHTML='<p style="color:#4a5580;font-family:monospace;font-size:12px;text-align:center;padding:30px">Nessun risultato</p>';return;}
+  list.innerHTML=rows.map(function(r){
+    var st=stCfg(r.status);
+    return '<div class="db-row">'
+      +'<div style="width:8px;height:8px;border-radius:50%;background:'+st.color+';box-shadow:0 0 5px '+st.color+';flex-shrink:0;margin-top:4px"></div>'
+      +'<div class="db-body">'
+        +'<div class="db-plate">'+r.plate+'</div>'
+        +'<div class="db-name">'+r.brand+' '+r.model+'</div>'
+        +'<div class="db-sub">'+r.owner+' · '+r.year+' · '+r.color+'</div>'
+        +'<div style="margin-top:4px"><span class="badge" style="color:'+st.color+';background:'+st.bg+';border-color:'+st.border+'">'+st.label+'</span></div>'
+      +'</div>'
+      +'<div class="db-acts">'
+        +'<button style="color:#25d366" onclick="sendWA(\''+r.plate+'\')">💬</button>'
+        +'<button style="color:#00d4ff" onclick="startEdit('+r.id+')">✏️</button>'
+        +'<button style="color:#ff3d5a" onclick="delRow('+r.id+')">🗑️</button>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+  document.getElementById('hdr-db').textContent=db.length;
+}
+
+function startEdit(id){
+  var r=db.find(function(x){return x.id===id;});if(!r)return;
+  var el=document.getElementById('db-list');
+  var rows=el.querySelectorAll('.db-row');
+  // Trova la riga e sostituisci
+  renderDB();
+  // Inserisci form di edit
+  var html='<div class="card" style="border-color:#00d4ff;margin-bottom:8px">'
+    +'<div class="fg2">';
+  var fields=[['TARGA','plate'],['PROPRIETARIO','owner'],['MARCA','brand'],['MODELLO','model'],
+    ['ANNO','year'],['COLORE','color'],['OLIO','oil'],['BATTERIA','battery'],
+    ['PNEUMATICI','tires'],['CAVALLI','hp']];
+  fields.forEach(function(f){
+    html+='<div><span class="lbl">'+f[0]+'</span><input class="fi" id="ef-'+f[1]+'" value="'+(r[f[1]]||'')+'"/></div>';
+  });
+  html+='<div><span class="lbl">STATO</span><select class="fi" id="ef-status">'
+    +'<option value="ok"'+(r.status==='ok'?' selected':'')+'">✓ Regolare</option>'
+    +'<option value="wanted"'+(r.status==='wanted'?' selected':'')+'>🔴 Ricercato</option>'
+    +'<option value="expired"'+(r.status==='expired'?' selected':'')+'>⏱ Scaduta</option>'
+    +'<option value="stolen"'+(r.status==='stolen'?' selected':'')+'>🚨 Rubato</option>'
+    +'</select></div>'
+    +'</div>'
+    +'<input class="fi" id="ef-note" placeholder="Note" value="'+(r.note||'')+'" style="margin-bottom:8px"/>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button class="btn btn-save" onclick="saveEdit('+id+')" style="flex:1;margin:0">✓ Salva</button>'
+    +'<button class="btn btn-cancel" onclick="renderDB()" style="flex:1;margin:0">✕ Annulla</button>'
+    +'</div></div>';
+  el.insertAdjacentHTML('afterbegin', html);
+}
+
+function saveEdit(id){
+  var i=db.findIndex(function(x){return x.id===id;});if(i<0)return;
+  ['plate','owner','brand','model','year','color','oil','battery','tires','hp','status','note'].forEach(function(f){
+    var el=document.getElementById('ef-'+f);
+    if(el) db[i][f]=el.value;
+  });
+  renderDB();
+}
+
+function delRow(id){
+  if(!confirm('Eliminare questo veicolo?'))return;
+  db=db.filter(function(r){return r.id!==id;});
+  renderDB();
+}
+
+// ══════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════
+function renderDash(){
+  document.getElementById('d-tot').textContent=db.length;
+  document.getElementById('d-ok').textContent=db.filter(function(r){return r.status==='ok';}).length;
+  document.getElementById('d-al').textContent=db.filter(function(r){return r.status!=='ok';}).length;
+  // History
+  var hl=document.getElementById('d-hist');
+  if(!history.length){hl.innerHTML='<span style="color:#4a5580;font-family:monospace;font-size:12px">Nessuna scansione ancora.</span>';return;}
+  hl.innerHTML=history.slice(0,8).map(function(h){
+    var st=stCfg(h.match?h.match.status:'unknown');
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1f2845">'
+      +'<div style="width:8px;height:8px;border-radius:50%;background:'+st.color+';flex-shrink:0"></div>'
+      +'<div style="font-family:monospace;font-size:13px;font-weight:900;color:#f5c842;min-width:80px">'+h.plate+'</div>'
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:700">'+(h.match?h.match.brand+' '+h.match.model:'Non registrata')+'</div>'
+      +'<div style="font-family:monospace;font-size:10px;color:'+st.color+'">'+st.label+'</div></div>'
+      +'<div style="font-family:monospace;font-size:10px;color:#4a5580">'+h.time.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})+'</div>'
+      +'</div>';
+  }).join('');
+  // Allerta
+  var al=document.getElementById('d-alert');
+  var alerts=db.filter(function(r){return r.status!=='ok';});
+  if(!alerts.length){al.innerHTML='<span style="color:#00e676;font-family:monospace;font-size:12px">✅ Nessun veicolo in allerta</span>';return;}
+  al.innerHTML=alerts.map(function(r){
+    var st=stCfg(r.status);
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1f2845">'
+      +'<div style="width:8px;height:8px;border-radius:50%;background:'+st.color+';flex-shrink:0"></div>'
+      +'<div style="font-family:monospace;font-size:13px;font-weight:900;color:#f5c842;min-width:80px">'+r.plate+'</div>'
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:700">'+r.brand+' '+r.model+'</div>'
+      +'<div style="font-family:monospace;font-size:10px;color:'+st.color+'">'+st.label+'</div></div>'
+      +'<button class="btn btn-wa" style="width:auto;padding:6px 10px;margin:0;font-size:12px" onclick="sendWA(\''+r.plate+'\')">💬</button>'
+      +'</div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// AGGIUNGI
+// ══════════════════════════════════════════════════════════
+function doAdd(){
+  var plate=document.getElementById('a-plate').value.trim().toUpperCase().replace(/[\s\-.]/g,'');
+  var owner=document.getElementById('a-owner').value.trim();
+  var msg=document.getElementById('add-msg');
+  if(!plate||!owner){msg.innerHTML='<div class="msg-err">⚠️ Targa e proprietario obbligatori</div>';return;}
+  db.push({
+    id:nextId++,plate:plate,owner:owner,
+    phone:document.getElementById('a-phone').value,
+    brand:document.getElementById('a-brand').value,
+    model:document.getElementById('a-model').value,
+    year:document.getElementById('a-year').value||2024,
+    color:document.getElementById('a-color').value,
+    fuel:document.getElementById('a-fuel').value,
+    hp:document.getElementById('a-hp').value,
+    cc:document.getElementById('a-cc').value,
+    oil:document.getElementById('a-oil').value,
+    battery:document.getElementById('a-battery').value,
+    tires:document.getElementById('a-tires').value,
+    revision:document.getElementById('a-rev').value,
+    status:document.getElementById('a-status').value,
+    note:document.getElementById('a-note').value,
+  });
+  ['a-plate','a-owner','a-phone','a-brand','a-model','a-color','a-hp','a-cc','a-oil','a-battery','a-tires','a-note','a-rev']
+    .forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('hdr-db').textContent=db.length;
+  msg.innerHTML='<div class="msg-ok">✅ Veicolo aggiunto con successo!</div>';
+  setTimeout(function(){msg.innerHTML='';},3000);
+}
+
+function prefillAdd(plate){
+  document.getElementById('a-plate').value=plate;
+  go('add',document.querySelectorAll('nav button')[3]);
+}
+
+// INIT
+renderDB();
+renderDash();
+</script>
+</body>
+</html>
