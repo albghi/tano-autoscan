@@ -14,11 +14,11 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-haiku-20241022',
+        model: 'claude-opus-4-5',
         max_tokens: 20,
         messages: [{ role: 'user', content: [
           { type: 'image', source: { type: 'base64', media_type: image_mime || 'image/jpeg', data: image_base64 }},
-          { type: 'text', text: "Leggi la targa italiana. Rispondi SOLO con i caratteri (es: FA036BV). Se non c'è targa: NESSUNA_TARGA" }
+          { type: 'text', text: "Leggi la targa italiana. Solo i caratteri (es: FA036BV). Se non c'e' targa: NESSUNA_TARGA" }
         ]}]
       })
     });
