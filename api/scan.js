@@ -42,24 +42,48 @@ export default async function handler(req, res) {
       const targaRes = await fetch(url);
       const xml = await targaRes.text();
 
-      // Parse XML response
-      const getValue = (tag) => {
-        const match = xml.match(new RegExp(`<${tag}>([^<]*)</${tag}>`));
-        return match ? match[1].trim() : '';
-      };
+      // Estrai il JSON dalla risposta XML
+      const jsonMatch = xml.match(/<vehicleJson[^>]*>([\s\S]*?)<\/vehicleJson>/i) ||
+                        xml.match(/<string[^>]*>([\s\S]*?)<\/string>/i);
 
-      const vehicleData = {
-        make: getValue('make') || getValue('Make'),
-        model: getValue('model') || getValue('Model'),
-        year: getValue('RegistrationYear') || getValue('year'),
-        color: getValue('color') || getValue('Color'),
-        fuel: getValue('fuel') || getValue('Fuel'),
-        cc: getValue('cc') || getValue('EngineSize'),
-        hp: getValue('bhp') || getValue('hp'),
-        immatricolazione: getValue('RegistrationDate'),
-        revisione: getValue('MOTExpiryDate') || getValue('revisione'),
-        raw: xml.length < 2000 ? xml : ''
-      };
+      let vehicleData = {};
+
+      if (jsonMatch) {
+        try {
+          const jsonStr = jsonMatch[1]
+            .replace(/&quot;/g, '"')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .trim();
+
+          const parsed = JSON.parse(jsonStr);
+
+          // Estrai i valori annidati (CurrentTextValue)
+          const val = (obj) => {
+            if (!obj) return '';
+            if (typeof obj === 'string') return obj;
+            if (obj.CurrentTextValue !== undefined) return obj.CurrentTextValue;
+            return '';
+          };
+
+          vehicleData = {
+            make: val(parsed.CarMake) || val(parsed.MakeDescription) || '',
+            model: val(parsed.CarModel) || val(parsed.ModelDescription) || val(parsed.Description) || '',
+            year: parsed.RegistrationYear || '',
+            color: val(parsed.Color) || val(parsed.Colour) || '',
+            fuel: val(parsed.FuelType) || '',
+            cc: val(parsed.EngineSize) || '',
+            hp: parsed.PowerCV || val(parsed.PowerCV) || '',
+            vin: parsed.Vin || '',
+            version: parsed.Version || ''
+          };
+        } catch(e) {
+          vehicleData = { error: 'Parse error: ' + e.message };
+        }
+      } else {
+        vehicleData = { error: 'Nessun dato trovato per questa targa' };
+      }
 
       return res.status(200).json({ vehicleData });
     }
