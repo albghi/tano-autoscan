@@ -1161,6 +1161,22 @@ async function startLisaVoice(){
       agentId:LISA_AGENT_ID,
       connectionType:"webrtc",
       dynamicVariables:{ origine:"tanoscan" },
+      clientTools:{
+        componi_numero: async function({ telefono }){
+          var num=String(telefono||"").replace(/[^\d+]/g,"");
+          if(!num) return "Numero non valido.";
+          try{
+            var bar=document.getElementById('callBar');
+            if(!bar){ bar=document.createElement('a'); bar.id='callBar';
+              bar.style.cssText="position:fixed;left:14px;right:14px;bottom:14px;z-index:99999;display:flex;align-items:center;justify-content:center;gap:10px;padding:18px 16px;border-radius:16px;background:#22c55e;color:#04120a;font:700 19px/1.15 system-ui,-apple-system,sans-serif;text-decoration:none;box-shadow:0 10px 34px rgba(0,0,0,.4);";
+              document.body.appendChild(bar); }
+            bar.href="tel:"+num; bar.textContent="\uD83D\uDCDE Chiama "+num;
+            bar.onclick=function(){ setTimeout(function(){ var b=document.getElementById('callBar'); if(b)b.remove(); },800); };
+            try{ window.location.href="tel:"+num; }catch(_){}
+          }catch(e){ console.error(e); return "Errore nell'aprire il telefono."; }
+          return "Ho preparato la chiamata. Tocca il pulsante verde in basso.";
+        }
+      },
       onConnect:function(){ _tanoLive=true; _tanoStarting=false; if(st)st.textContent='In ascolto...';
         if(_tanoPending){ var t=_tanoPending; _tanoPending=''; setTimeout(function(){ _tanoSend(t); },400); } },
       onDisconnect:function(){ _tanoLive=false; _tanoConv=null; if(st)st.textContent='Chiusa'; setTimeout(function(){ var p=document.getElementById('tano-lisa-panel'); if(p)p.style.display='none'; },800); },
