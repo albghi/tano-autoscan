@@ -270,14 +270,14 @@ input[type=file]::file-selector-button {
 <div id="pg-scanner" class="page on">
 
   <div id="preview-zone">
-    <div class="hint"><span class="ico">📷</span>Nessuna foto selezionata</div>
+    <div class="hint"><span class="ico"><svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="#4a5461" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>Nessuna foto selezionata</div>
   </div>
 
   <div class="file-btns">
     <!-- FOTOCAMERA -->
     <div class="file-wrap cam">
       <div class="file-deco">
-        <span class="ico2">📸</span>
+        <span class="ico2"><svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#ff8a1e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
         <span class="txt2">FOTOCAMERA</span>
       </div>
       <input type="file" accept="image/*" capture="environment" id="inp-cam" onchange="gotFile(this)"/>
@@ -285,14 +285,14 @@ input[type=file]::file-selector-button {
     <!-- GALLERIA -->
     <div class="file-wrap gal">
       <div class="file-deco">
-        <span class="ico2">🖼️</span>
+        <span class="ico2"><svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#8d99a8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg></span>
         <span class="txt2">GALLERIA</span>
       </div>
       <input type="file" accept="image/*" id="inp-gal" onchange="gotFile(this)"/>
     </div>
   </div>
 
-  <button id="btn-analizza" onclick="doScan()">🔍 ANALIZZA TARGA</button>
+  <button id="btn-analizza" onclick="doScan()" style="display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>ANALIZZA TARGA</button>
 
   <div class="card">
     <span class="lbl">🔠 RICERCA MANUALE</span>
@@ -300,7 +300,7 @@ input[type=file]::file-selector-button {
       <input id="inp-manual" type="text" placeholder="Es: FA036BV" maxlength="8"
         oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
         onkeydown="if(event.key==='Enter')doManual()"/>
-      <button onclick="doManual()">🔍</button>
+      <button onclick="doManual()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8d99a8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></button>
     </div>
   </div>
 
@@ -448,10 +448,9 @@ function lisaActions(plate){
   var today = new Date().toISOString().slice(0,10);
   return '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed #2c343f">'
     + '<div style="font-family:monospace;font-size:9px;color:#3ad29f;letter-spacing:.12em;margin-bottom:8px">\u279C DASHBOARD DI LISA</div>'
-    + '<button class="btn" style="background:linear-gradient(135deg,#e06a00,#ff8a1e);color:#231200;margin-bottom:8px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px" onclick="startLisaVoice()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/></svg>Prenota con Lisa (a voce)</button>'
-    + '<button class="btn" style="background:linear-gradient(135deg,#0c7a43,#3ad29f);color:#04210f;margin-bottom:8px" onclick="salvaVeicoloLisa()">\uD83D\uDCBE Salva veicolo su Lisa</button>'
+    + '<button class="btn" style="background:transparent;border:1.6px solid #ff8a1e;color:#ff8a1e;margin-bottom:8px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px" onclick="startLisaVoice()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/></svg>Prenota con Lisa (a voce)</button>'
     + '<div id="lisa-msg" style="font-family:monospace;font-size:11px;margin-bottom:8px"></div>'
-    + '<button class="btn" style="background:#222933;border:1px solid #3ad29f;color:#3ad29f;margin-bottom:0" onclick="toggleApptForm()">\uD83D\uDCC5 Crea appuntamento</button>'
+    + '<button class="btn" style="background:#222933;border:1px solid #3ad29f;color:#3ad29f;margin-bottom:0" onclick="toggleApptForm()">\uD83D\uDCC5 Crea appuntamento (tastiera)</button>'
     + '<div id="lisa-appt-form" style="display:none;margin-top:10px;background:#1c2128;border:1px solid #2c343f;border-radius:10px;padding:12px">'
       + '<span class="lbl">SEDE</span><select class="fi" id="la-sede" style="margin-bottom:8px"><option>Sacrofano</option><option>Borgo Pineto</option></select>'
       + '<div style="display:flex;gap:8px;margin-bottom:8px">'
@@ -611,7 +610,7 @@ function downloadFoto(fname){
 
 function clearImg(){
   curB64=null; curMime=null;
-  document.getElementById('preview-zone').innerHTML = '<div class="hint"><span class="ico">📷</span>Nessuna foto selezionata</div>';
+  document.getElementById('preview-zone').innerHTML = '<div class="hint"><span class="ico"><svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="#4a5461" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>Nessuna foto selezionata</div>';
   document.getElementById('btn-analizza').classList.remove('ready');
   document.getElementById('inp-cam').value='';
   document.getElementById('inp-gal').value='';
@@ -716,7 +715,7 @@ async function doScan(){
       +'↺ Riprova</button></div>';
   }
 
-  btn.innerHTML = '🔍 ANALIZZA TARGA';
+  btn.innerHTML = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>ANALIZZA TARGA';
   btn.disabled = false;
 }
 
@@ -848,28 +847,36 @@ function showResult(plate, match, loading, extData){
 function shareButtons(plate){
   return '<div style="margin-top:10px;">'
     +'<div style="font-family:monospace;font-size:10px;color:#5c6775;letter-spacing:.15em;margin-bottom:8px;">📤 CONDIVIDI</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
 
     // WhatsApp
-    +'<button onclick="shareWA(\''+plate+'\')" style="'
+    +'<button onclick="sendWA(\''+plate+'\')" style="'
     +'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
     +'padding:12px 6px;border-radius:12px;border:none;cursor:pointer;'
     +'background:linear-gradient(135deg,#075e54,#25d366);color:#fff;font-weight:900;font-size:12px;">'
-    +'<span style="font-size:22px;">💬</span>WhatsApp</button>'
+    +'<span style="display:flex"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.5-6c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-1.9-1.2 7.2 7.2 0 0 1-1.3-1.7c-.1-.2 0-.4.1-.5l.4-.5c.1-.1.2-.3.2-.4 0-.1 0-.3 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2 0-.1-.2-.2-.4-.3z"/></svg></span>WhatsApp</button>'
+
+    // SMS
+    +'<button onclick="sendSMS(\''+plate+'\')" style="'
+    +'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
+    +'padding:12px 6px;border-radius:12px;border:none;cursor:pointer;'
+    +'background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;font-weight:900;font-size:12px;">'
+    +'<span style="display:flex"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>SMS</button>'
+
 
     // Email
     +'<button onclick="shareEmail(\''+plate+'\')" style="'
     +'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
     +'padding:12px 6px;border-radius:12px;border:none;cursor:pointer;'
-    +'background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;font-weight:900;font-size:12px;">'
-    +'<span style="font-size:22px;">📧</span>Email</button>'
+    +'background:linear-gradient(135deg,#b45309,#f59e0b);color:#fff;font-weight:900;font-size:12px;">'
+    +'<span style="display:flex"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg></span>Email</button>'
 
     // Telegram
     +'<button onclick="shareTelegram(\''+plate+'\')" style="'
     +'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
     +'padding:12px 6px;border-radius:12px;border:none;cursor:pointer;'
-    +'background:linear-gradient(135deg,#006699,#0088cc);color:#fff;font-weight:900;font-size:12px;">'
-    +'<span style="font-size:22px;">✈️</span>Telegram</button>'
+    +'background:linear-gradient(135deg,#1c8ac2,#2aabee);color:#fff;font-weight:900;font-size:12px;">'
+    +'<span style="display:flex"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M21.8 4.2 2.9 11.5c-1 .4-1 1.1-.2 1.4l4.8 1.5 1.8 5.6c.2.5.1.7.6.7.4 0 .6-.2.8-.4l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8l3.2-15c.3-1.2-.4-1.7-1.3-1.3z"/></svg></span>Telegram</button>'
 
     +'</div>'
 
