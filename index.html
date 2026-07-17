@@ -207,7 +207,7 @@ input[type=file]::file-selector-button {
 
 /* Barra invio WhatsApp / SMS sotto ogni scheda del database */
 .db-send {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px;
   background: #2c343f; border: 1px solid #2c343f; border-top: none;
   border-radius: 0 0 12px 12px; overflow: hidden; margin-bottom: 8px;
 }
@@ -217,6 +217,7 @@ input[type=file]::file-selector-button {
 }
 .db-send .db-wa  { background: linear-gradient(135deg,#075e54,#25d366); color: #fff; }
 .db-send .db-sms { background: linear-gradient(135deg,#1e3a8a,#3b82f6); color: #fff; }
+.db-send .db-mic { background: linear-gradient(135deg,#c85a00,#ff8a1e); color: #fff; }
 
 /* ─── FORM GRID ─── */
 .fg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
@@ -379,6 +380,16 @@ var db = [
 var nextId = 6;
 var scanCount = 0;
 var scanHistory = [];
+var DB_KEY='tano_db_v1';
+(function(){
+  try{
+    var saved=localStorage.getItem(DB_KEY);
+    if(saved){ var arr=JSON.parse(saved); if(Array.isArray(arr)){ db=arr; } }
+    else { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+    if(db.length) nextId=Math.max.apply(null, db.map(function(r){return (+r.id)||0;}))+1;
+  }catch(e){ console.error('DB load', e); }
+})();
+function saveDB(){ try{ localStorage.setItem(DB_KEY, JSON.stringify(db)); }catch(e){} }
 
 var ST = {
   ok:      {label:"Regolare",          color:"#3ad29f",bg:"#3ad29f14",border:"#3ad29f33"},
@@ -506,6 +517,7 @@ async function creaAppuntamentoLisa(){
     });
     if(res.ok){
       setApptMsg('\u2705 Appuntamento creato (calendario + dashboard di Lisa).', '#3ad29f');
+      autoSaveVehicle();
     }else{
       var t = await res.text().catch(function(){return '';});
       setApptMsg('\u274C Errore ('+res.status+'). '+(t?('\u2014 '+t.slice(0,140)):''), '#ff5d5d');
@@ -984,12 +996,14 @@ function renderDB(){
         +'</div>'
       +'</div>'
       +'<div class="db-send">'
-        +'<button class="db-wa" onclick="sendWA(\''+r.plate+'\')"><span style="font-size:16px">💬</span> WhatsApp</button>'
-        +'<button class="db-sms" onclick="sendSMS(\''+r.plate+'\')"><span style="font-size:16px">📱</span> SMS</button>'
+        +'<button class="db-wa" onclick="sendWA(\''+r.plate+'\')"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" style="flex:none"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm4.5 12c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-1.9-1.2 7.2 7.2 0 0 1-1.3-1.7c-.1-.2 0-.4.1-.5l.4-.5c.1-.1.2-.3.2-.4 0-.1 0-.3 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2z"/></svg> WhatsApp</button>'
+        +'<button class="db-sms" onclick="sendSMS(\''+r.plate+'\')"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> SMS</button>'
+        +'<button class="db-mic" onclick="startLisaVoiceForPlate(\''+r.plate+'\')"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/></svg> Lisa</button>'
       +'</div>'
       +'</div>';
   }).join('');
   document.getElementById('hdr-db').textContent=db.length;
+  saveDB();
 }
 
 function startEdit(id){
@@ -1100,7 +1114,7 @@ function doAdd(){
   });
   ['a-plate','a-owner','a-phone','a-brand','a-model','a-color','a-hp','a-cc','a-oil','a-battery','a-tires','a-note','a-rev']
     .forEach(function(id){document.getElementById(id).value='';});
-  document.getElementById('hdr-db').textContent=db.length;
+  renderDB();
   msg.innerHTML='<div class="msg-ok">✅ Veicolo aggiunto con successo!</div>';
   setTimeout(function(){msg.innerHTML='';},3000);
 }
@@ -1184,6 +1198,14 @@ async function startLisaVoice(){
             try{ window.location.href="tel:"+num; }catch(_){}
           }catch(e){ console.error(e); return "Errore nell'aprire il telefono."; }
           return "Ho preparato la chiamata. Tocca il pulsante verde in basso.";
+        },
+        mostra_riepilogo: async function({ nome, targa, telefono, tipo, data, ora }){
+          try{ mostraRiepilogo({nome:nome,targa:targa,telefono:telefono,tipo:tipo,data:data,ora:ora}); }catch(e){ console.error(e); }
+          return "Riepilogo mostrato sullo schermo di Gaspare.";
+        },
+        chiudi_riepilogo: async function(){
+          try{ chiudiRiepilogo(); autoSaveVehicle(); }catch(e){}
+          return "Riepilogo chiuso.";
         }
       },
       onConnect:function(){ _tanoLive=true; _tanoStarting=false; if(st)st.textContent='In ascolto...';
@@ -1205,6 +1227,54 @@ async function stopLisaVoice(){
   if(_tanoConv){ try{ await _tanoConv.endSession(); }catch(e){} _tanoConv=null; }
   _tanoLive=false;
   var p=document.getElementById('tano-lisa-panel'); if(p)p.style.display='none';
+}
+function mostraRiepilogo(d){
+  var el=document.getElementById('tano-riepilogo');
+  if(!el){
+    el=document.createElement('div'); el.id='tano-riepilogo';
+    el.style.cssText="position:fixed;inset:0;z-index:100000;background:rgba(4,8,12,.78);display:none;align-items:center;justify-content:center;padding:18px;";
+    document.body.appendChild(el);
+  }
+  function row(lbl,val){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #232a33">'
+      +'<span style="color:#8d99a8;font-size:12px;font-family:monospace;letter-spacing:.08em">'+lbl+'</span>'
+      +'<span style="color:#e8edf2;font-size:16px;font-weight:800;text-align:right">'+(val&&String(val).trim()?val:'—')+'</span></div>';
+  }
+  el.innerHTML='<div style="width:100%;max-width:430px;background:#141a20;border:1.5px solid #ff8a1e;border-radius:18px;padding:20px 20px 22px;box-shadow:0 24px 70px rgba(0,0,0,.65)">'
+    +'<div style="display:flex;align-items:center;gap:9px;margin-bottom:14px"><span style="width:11px;height:11px;border-radius:50%;background:#ff8a1e;box-shadow:0 0 12px #ff8a1e"></span><span style="color:#ff8a1e;font-weight:900;font-size:15px;letter-spacing:.05em">RIEPILOGO APPUNTAMENTO</span></div>'
+    +row('CLIENTE', d.nome)+row('TARGA', d.targa)+row('TELEFONO', d.telefono)+row('INTERVENTO', d.tipo)+row('DATA', d.data)+row('ORA', d.ora)
+    +'<div style="margin-top:16px;text-align:center;color:#8d99a8;font-size:13px">Conferma a voce a Lisa per registrare</div>'
+    +'</div>';
+  el.style.display='flex';
+}
+function chiudiRiepilogo(){ var el=document.getElementById('tano-riepilogo'); if(el) el.style.display='none'; }
+function autoSaveVehicle(v){
+  try{
+    v = v || window._lisaVehicle || {};
+    var plate=(v.targa||v.plate||'').toString().toUpperCase().replace(/[\s\-.]/g,'');
+    if(!plate) return;
+    var ex=db.find(function(r){return norm(r.plate)===norm(plate);});
+    if(ex){
+      if(!ex.brand && (v.marca||v.brand)) ex.brand=v.marca||v.brand;
+      if(!ex.model && (v.modello||v.model)) ex.model=v.modello||v.model;
+      if(!ex.year && (v.anno||v.year)) ex.year=v.anno||v.year;
+    } else {
+      db.push({ id:nextId++, plate:plate, owner:v.owner||'', phone:v.phone||'',
+        brand:v.marca||v.brand||'', model:v.modello||v.model||'', year:v.anno||v.year||'',
+        color:v.color||'', fuel:v.alimentazione||v.fuel||'', hp:v.hp||'',
+        cc:v.cilindrata||v.cc||'', oil:'', battery:'', tires:'', revision:'',
+        status:'ok', note:'Salvato da appuntamento' });
+    }
+    saveDB();
+    try{ renderDB(); }catch(e){}
+    try{ document.getElementById('hdr-db').textContent=db.length; }catch(e){}
+  }catch(e){ console.error('autoSaveVehicle', e); }
+}
+function startLisaVoiceForPlate(plate){
+  var r=db.find(function(x){return norm(x.plate)===norm(plate);});
+  if(!r){ alert('Targa non trovata nel database.'); return; }
+  window._lisaVehicle={ targa:r.plate, marca:r.brand, modello:r.model, anno:r.year, cilindrata:r.cc, alimentazione:r.fuel };
+  startLisaVoice();
 }
 </script>
 </body>
