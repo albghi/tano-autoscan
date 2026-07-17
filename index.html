@@ -1160,6 +1160,7 @@ async function startLisaVoice(){
     _tanoConv=await SDK.Conversation.startSession({
       agentId:LISA_AGENT_ID,
       connectionType:"webrtc",
+      dynamicVariables:{ origine:"tanoscan" },
       onConnect:function(){ _tanoLive=true; _tanoStarting=false; if(st)st.textContent='In ascolto...';
         if(_tanoPending){ var t=_tanoPending; _tanoPending=''; setTimeout(function(){ _tanoSend(t); },400); } },
       onDisconnect:function(){ _tanoLive=false; _tanoConv=null; if(st)st.textContent='Chiusa'; setTimeout(function(){ var p=document.getElementById('tano-lisa-panel'); if(p)p.style.display='none'; },800); },
