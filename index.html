@@ -669,7 +669,9 @@ async function doScan(){
 
     if (!res.ok) {
       var errText = await res.text();
-      throw new Error('Errore server: ' + res.status);
+      var emsg = 'Errore server: ' + res.status;
+      try { var ej = JSON.parse(errText); if (ej && ej.error) emsg = ej.error; } catch(_){}
+      throw new Error(emsg);
     }
 
     var data = await res.json();
