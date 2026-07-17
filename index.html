@@ -547,9 +547,10 @@ window.addEventListener('popstate', function(){
 // ══════════════════════════════════════════════════════════
 // GESTIONE FILE — approccio più semplice possibile
 // ══════════════════════════════════════════════════════════
-var curB64 = null, curMime = null;
+var curB64 = null, curMime = null, curFile = null, lastSource = null;
 
 function gotFile(input){
+  lastSource = input.id;
   // Polling: controlla il file ogni 100ms fino a 3 secondi
   var tries = 0;
   var poll = setInterval(function(){
@@ -566,17 +567,45 @@ function gotFile(input){
 
 function readFile(file){
   if(!file.type.startsWith('image/')) return;
+  curFile = file;
   var reader = new FileReader();
   reader.onload = function(ev){
     var dataUrl = ev.target.result;
     curB64  = dataUrl.split(',')[1];
     curMime = file.type;
     var z = document.getElementById('preview-zone');
-    z.innerHTML = '<img src="'+dataUrl+'"/><button class="clear-btn" onclick="clearImg()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.85);border:1px solid #333;border-radius:8px;color:#aaa;cursor:pointer;padding:4px 10px;font-size:12px;">✕ Cambia</button>';
+    var saveBtn = (lastSource === 'inp-cam')
+      ? '<button class="save-gal-btn" onclick="salvaInGalleria()" style="position:absolute;bottom:8px;left:8px;background:#16a34a;border:none;border-radius:8px;color:#fff;cursor:pointer;padding:7px 12px;font-size:13px;font-weight:700;">💾 Salva in galleria</button>'
+      : '';
+    z.innerHTML = '<img src="'+dataUrl+'"/><button class="clear-btn" onclick="clearImg()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.85);border:1px solid #333;border-radius:8px;color:#aaa;cursor:pointer;padding:4px 10px;font-size:12px;">✕ Cambia</button>' + saveBtn;
     document.getElementById('btn-analizza').classList.add('ready');
     document.getElementById('result-area').innerHTML = '';
   };
   reader.readAsDataURL(file);
+}
+
+// Salva la foto SCATTATA dalla fotocamera nella galleria del telefono
+function salvaInGalleria(){
+  try{
+    var fname = 'TANOSCAN-' + new Date().toISOString().slice(0,19).replace(/[:T]/g,'-') + '.jpg';
+    if(curFile && navigator.canShare){
+      var f = new File([curFile], fname, {type: curFile.type || 'image/jpeg'});
+      if(navigator.canShare({files:[f]})){
+        navigator.share({files:[f], title:'Foto TANOSCAN'}).catch(function(){ downloadFoto(fname); });
+        return;
+      }
+    }
+    downloadFoto(fname);
+  }catch(e){ downloadFoto('TANOSCAN.jpg'); }
+}
+function downloadFoto(fname){
+  try{
+    var a = document.createElement('a');
+    a.href = 'data:'+(curMime||'image/jpeg')+';base64,'+curB64;
+    a.download = fname;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ document.body.removeChild(a); }, 500);
+  }catch(e){ alert('Non riesco a salvare la foto.'); }
 }
 
 function clearImg(){
