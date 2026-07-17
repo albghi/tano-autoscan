@@ -448,6 +448,7 @@ function lisaActions(plate){
   var today = new Date().toISOString().slice(0,10);
   return '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed #2c343f">'
     + '<div style="font-family:monospace;font-size:9px;color:#3ad29f;letter-spacing:.12em;margin-bottom:8px">\u279C DASHBOARD DI LISA</div>'
+    + '<button class="btn" style="background:linear-gradient(135deg,#7a1e63,#d23a9f);color:#fff;margin-bottom:8px;font-weight:700" onclick="startLisaVoice()">\uD83C\uDFA4 Prenota con Lisa (a voce)</button>'
     + '<button class="btn" style="background:linear-gradient(135deg,#0c7a43,#3ad29f);color:#04210f;margin-bottom:8px" onclick="salvaVeicoloLisa()">\uD83D\uDCBE Salva veicolo su Lisa</button>'
     + '<div id="lisa-msg" style="font-family:monospace;font-size:11px;margin-bottom:8px"></div>'
     + '<button class="btn" style="background:#222933;border:1px solid #3ad29f;color:#3ad29f;margin-bottom:0" onclick="toggleApptForm()">\uD83D\uDCC5 Crea appuntamento</button>'
@@ -1120,6 +1121,64 @@ renderDash();
 <script>
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js');
+}
+</script>
+<script type="module">
+  import { Conversation } from "https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm";
+  window.__LisaSDK = { Conversation };
+</script>
+<script>
+// ===== Prenotazione VOCALE con Lisa dallo scanner (targa gia' nota) =====
+var LISA_AGENT_ID = "agent_8901kxjetf1zfmrat1dg3hfcky6x";
+var _tanoConv=null, _tanoLive=false, _tanoStarting=false, _tanoPending="";
+function _tanoPanel(){
+  var p=document.getElementById('tano-lisa-panel');
+  if(p) return p;
+  p=document.createElement('div');
+  p.id='tano-lisa-panel';
+  p.style.cssText="position:fixed;left:14px;right:14px;bottom:14px;z-index:9999;background:#141a20;border:1px solid #d23a9f;border-radius:14px;padding:14px 16px;box-shadow:0 10px 34px rgba(0,0,0,.5);display:none;align-items:center;gap:12px";
+  p.innerHTML='<span style="width:12px;height:12px;border-radius:50%;background:#d23a9f;flex:none"></span>'
+    +'<div style="flex:1;color:#e8edf2;font:600 14px system-ui"><div id="tano-lisa-status">In ascolto...</div><div id="tano-lisa-sub" style="font-weight:400;font-size:12px;color:#8d99a8"></div></div>'
+    +'<button onclick="stopLisaVoice()" style="background:#ff5d5d;border:none;border-radius:10px;color:#fff;font-weight:700;padding:9px 14px;cursor:pointer">Chiudi</button>';
+  document.body.appendChild(p);
+  return p;
+}
+async function startLisaVoice(){
+  var v=window._lisaVehicle||{};
+  if(!v.targa){ alert('Prima scansiona o cerca una targa.'); return; }
+  if(_tanoLive||_tanoStarting) return;
+  var SDK=window.__LisaSDK;
+  if(!SDK||!SDK.Conversation){ alert('Lisa si sta caricando, riprova tra un attimo.'); return; }
+  _tanoStarting=true;
+  var panel=_tanoPanel(); panel.style.display='flex';
+  var st=document.getElementById('tano-lisa-status'), sub=document.getElementById('tano-lisa-sub');
+  st.textContent='Connessione...';
+  var veic=[v.marca,v.modello,v.anno].filter(Boolean).join(' ');
+  sub.textContent='Targa '+v.targa+(veic?' \u00B7 '+veic:'');
+  _tanoPending='Devo prenotare un appuntamento. La targa e\' '+v.targa+(veic?' ('+veic+')':'')+'. Ti detto io: nome cliente, telefono, tipo di intervento, giorno, ora e sede. Non chiedermi la targa, ce l\'hai gia\'.';
+  try{
+    _tanoConv=await SDK.Conversation.startSession({
+      agentId:LISA_AGENT_ID,
+      connectionType:"webrtc",
+      onConnect:function(){ _tanoLive=true; _tanoStarting=false; if(st)st.textContent='In ascolto...';
+        if(_tanoPending){ var t=_tanoPending; _tanoPending=''; setTimeout(function(){ _tanoSend(t); },400); } },
+      onDisconnect:function(){ _tanoLive=false; _tanoConv=null; if(st)st.textContent='Chiusa'; setTimeout(function(){ var p=document.getElementById('tano-lisa-panel'); if(p)p.style.display='none'; },800); },
+      onError:function(e){ console.error('Lisa TANO error',e); _tanoStarting=false; if(st)st.textContent='Errore di connessione'; },
+      onMessage:function(m){ if(m&&m.message&&sub){ sub.textContent=(m.source==='user'?'Tu: ':'Lisa: ')+m.message; } }
+    });
+  }catch(e){ console.error(e); _tanoStarting=false; if(st)st.textContent='Impossibile avviare Lisa'; }
+}
+function _tanoSend(text){
+  if(!_tanoConv) return;
+  try{
+    if(typeof _tanoConv.sendUserMessage==='function'){ _tanoConv.sendUserMessage(text); return; }
+    if(typeof _tanoConv.sendText==='function'){ _tanoConv.sendText(text); return; }
+  }catch(e){ console.error('tano send',e); }
+}
+async function stopLisaVoice(){
+  if(_tanoConv){ try{ await _tanoConv.endSession(); }catch(e){} _tanoConv=null; }
+  _tanoLive=false;
+  var p=document.getElementById('tano-lisa-panel'); if(p)p.style.display='none';
 }
 </script>
 </body>
