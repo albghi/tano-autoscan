@@ -1190,7 +1190,7 @@ async function startLisaVoice(){
     _tanoConv=await SDK.Conversation.startSession({
       agentId:LISA_AGENT_ID,
       connectionType:"webrtc",
-      dynamicVariables:{ origine:"tanoscan" },
+      dynamicVariables:{ origine:"tanoscan", oggi: (function(){try{var d=new Date();var a=new Intl.DateTimeFormat("it-IT",{timeZone:"Europe/Rome",weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(d);var b=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Rome",year:"numeric",month:"2-digit",day:"2-digit"}).format(d);return a+" ("+b+")";}catch(e){return new Date().toISOString().slice(0,10);}})() },
       clientTools:{
         componi_numero: async function({ telefono }){
           var num=String(telefono||"").replace(/[^\d+]/g,"");
