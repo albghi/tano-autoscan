@@ -977,6 +977,13 @@ function renderDB(){
       ||(r.owner||'').toLowerCase().includes(q)
       ||(r.brand||'').toLowerCase().includes(q);
   });
+  // Ordine di lettura: l'ULTIMA targa registrata sta in CIMA.
+  // Chi non ha savedAt (le schede di partenza) passa dopo, dal piu' recente id.
+  rows = rows.slice().sort(function(a,b){
+    var sa=+a.savedAt||0, sb=+b.savedAt||0;
+    if(sa!==sb) return sb-sa;
+    return (+b.id||0)-(+a.id||0);
+  });
   if(!rows.length){list.innerHTML='<p style="color:#b6c2d0;font-family:monospace;font-size:12px;text-align:center;padding:30px">Nessun risultato</p>';return;}
   list.innerHTML=rows.map(function(r){
     var st=stCfg(r.status);
@@ -1041,6 +1048,7 @@ function saveEdit(id){
     var el=document.getElementById('ef-'+f);
     if(el) db[i][f]=el.value;
   });
+  db[i].savedAt = Date.now();
   renderDB();
 }
 
@@ -1095,7 +1103,7 @@ function doAdd(){
   var msg=document.getElementById('add-msg');
   if(!plate){msg.innerHTML='<div class="msg-err">⚠️ La targa è obbligatoria</div>';return;}
   db.push({
-    id:nextId++,plate:plate,owner:owner,
+    id:nextId++,plate:plate,owner:owner,savedAt:Date.now(),
     phone:document.getElementById('a-phone').value,
     brand:document.getElementById('a-brand').value,
     model:document.getElementById('a-model').value,
@@ -1280,12 +1288,13 @@ function autoSaveVehicle(v, extra){
       if(extra.owner) ex.owner=extra.owner;
       if(extra.phone) ex.phone=extra.phone;
       if(extra.note)  ex.note =extra.note;
+      ex.savedAt = Date.now();
     } else {
       ex = { id:nextId++, plate:plate, owner:extra.owner||v.owner||'', phone:extra.phone||v.phone||'',
         brand:v.marca||v.brand||'', model:v.modello||v.model||'', year:v.anno||v.year||'',
         color:v.color||'', fuel:v.alimentazione||v.fuel||'', hp:v.hp||'',
         cc:v.cilindrata||v.cc||'', oil:'', battery:'', tires:'', revision:'',
-        status:'ok', note:extra.note||'Salvato da TANOSCAN' };
+        status:'ok', note:extra.note||'Salvato da TANOSCAN', savedAt:Date.now() };
       db.push(ex);
     }
     saveDB();
