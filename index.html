@@ -17,7 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #15181d; color: #e8edf2; font-family: 'Space Grotesk', system-ui, sans-serif; }
+body { background: #15181d; color: #f2f6fa; font-family: 'Space Grotesk', system-ui, sans-serif; }
 :root { --mono: 'Space Mono', ui-monospace, monospace; --sans: 'Space Grotesk', system-ui, sans-serif; }
 /* Allinea ogni testo monospace inline al font del dashboard (Space Mono) */
 [style*="monospace"] { font-family: var(--mono) !important; }
@@ -27,13 +27,13 @@ header {
   padding: 14px 16px; display: flex; align-items: center; gap: 12px;
 }
 .logo { font-size: 22px; font-weight: 900; color: #ff8a1e; }
-.logo span { font-size: 11px; display: block; color: #5c6775; font-weight: 400; }
+.logo span { font-size: 11px; display: block; color: #b6c2d0; font-weight: 400; }
 
 nav { display: flex; background: #1c2128; border-bottom: 1px solid #2c343f; overflow-x: auto; }
 nav button {
   flex: 1; min-width: 80px; padding: 13px 8px;
   background: none; border: none; border-bottom: 3px solid transparent;
-  color: #5c6775; cursor: pointer; font-size: 13px; font-weight: 700;
+  color: #b6c2d0; cursor: pointer; font-size: 13px; font-weight: 700;
   white-space: nowrap;
 }
 nav button.on { color: #ff8a1e; border-bottom-color: #ff8a1e; }
@@ -42,7 +42,7 @@ nav button.on { color: #ff8a1e; border-bottom-color: #ff8a1e; }
 .page.on { display: block; }
 
 .card { background: #1c2128; border: 1px solid #2c343f; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-.lbl { font-size: 10px; color: #5c6775; letter-spacing: .12em; display: block; margin-bottom: 4px; font-family: 'Space Mono', monospace; }
+.lbl { font-size: 10px; color: #b6c2d0; letter-spacing: .12em; display: block; margin-bottom: 4px; font-family: 'Space Mono', monospace; }
 
 /* ─── ZONE PHOTO ─── */
 #preview-zone {
@@ -52,12 +52,12 @@ nav button.on { color: #ff8a1e; border-bottom-color: #ff8a1e; }
   position: relative;
 }
 #preview-zone img { max-height: 200px; max-width: 100%; border-radius: 10px; }
-#preview-zone .hint { color: #5c6775; font-size: 13px; }
+#preview-zone .hint { color: #b6c2d0; font-size: 13px; }
 #preview-zone .hint .ico { font-size: 34px; display: block; margin-bottom: 4px; }
 #clear-btn {
   position: absolute; top: 8px; right: 8px;
   background: rgba(0,0,0,.85); border: 1px solid #333;
-  border-radius: 8px; color: #aaa; cursor: pointer;
+  border-radius: 8px; color: #d5dce6; cursor: pointer;
   padding: 4px 10px; font-size: 12px;
 }
 
@@ -110,7 +110,7 @@ input[type=file]::file-selector-button {
 .file-deco .ico2 { font-size: 28px; }
 .file-deco .txt2 { font-size: 15px; font-weight: 800; letter-spacing: .06em; }
 .file-wrap.cam .file-deco .txt2 { color: #ff8a1e; }
-.file-wrap.gal .file-deco .txt2 { color: #8d99a8; }
+.file-wrap.gal .file-deco .txt2 { color: #c3cddb; }
 
 /* ─── BOUTON ANALIZZA ─── */
 #btn-analizza {
@@ -133,7 +133,7 @@ input[type=file]::file-selector-button {
 }
 .search-row button {
   background: #1c2128; border: 1px solid #2c343f;
-  border-radius: 8px; color: #8d99a8; cursor: pointer;
+  border-radius: 8px; color: #c3cddb; cursor: pointer;
   padding: 12px 14px; font-size: 18px;
 }
 
@@ -161,8 +161,8 @@ input[type=file]::file-selector-button {
 .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #2c343f; border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
 .tc { background: #1c2128; padding: 10px 12px; }
 .tc.full { grid-column: 1/-1; }
-.tc-k { font-family: 'Space Mono', monospace; font-size: 9px; color: #5c6775; letter-spacing: .12em; margin-bottom: 2px; }
-.tc-v { font-size: 14px; font-weight: 700; color: #e8edf2; }
+.tc-k { font-family: 'Space Mono', monospace; font-size: 9px; color: #b6c2d0; letter-spacing: .12em; margin-bottom: 2px; }
+.tc-v { font-size: 14px; font-weight: 700; color: #f2f6fa; }
 .tc-v.hi { color: #ff8a1e; }
 
 /* ─── STATUS BADGE ─── */
@@ -172,18 +172,18 @@ input[type=file]::file-selector-button {
 .btn { display: block; width: 100%; padding: 13px; border-radius: 10px; border: none;
   font-size: 16px; font-weight: 800; cursor: pointer; letter-spacing: .05em; margin-bottom: 8px; text-align: center; }
 .btn-wa { background: linear-gradient(135deg,#075e54,#128c7e); color: #fff; }
-.btn-copy { background: #1c2128; border: 1px solid #2c343f !important; color: #8d99a8; }
+.btn-copy { background: #1c2128; border: 1px solid #2c343f !important; color: #c3cddb; }
 .btn-add-db { background: linear-gradient(135deg,#1d4ed8,#3b82f6); color: #fff; }
 .btn-add-v { background: linear-gradient(135deg,#1d4ed8,#3b82f6); color: #fff; }
 .btn-save { background: #052e16; color: #3ad29f; border: 1px solid #3ad29f33 !important; }
-.btn-cancel { background: transparent; color: #5c6775; border: 1px solid #2c343f !important; }
+.btn-cancel { background: transparent; color: #b6c2d0; border: 1px solid #2c343f !important; }
 
 /* ─── DB ROW ─── */
 .db-row { background: #1c2128; border: 1px solid #2c343f; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; gap: 10px; }
-.db-plate { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 900; color: #e8edf2; min-width: 85px; }
+.db-plate { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 900; color: #f2f6fa; min-width: 85px; }
 .db-body { flex: 1; }
-.db-name { font-size: 14px; font-weight: 700; }
-.db-sub { font-family: 'Space Mono', monospace; font-size: 11px; color: #5c6775; }
+.db-name { font-size: 14px; font-weight: 700; color: #f2f6fa; }
+.db-sub { font-family: 'Space Mono', monospace; font-size: 11px; color: #b6c2d0; }
 .db-acts { display: flex; flex-direction: column; gap: 4px; }
 .db-acts button { background: none; border: 1px solid #2c343f; border-radius: 6px; cursor: pointer; padding: 4px 8px; font-size: 13px; }
 
@@ -191,7 +191,7 @@ input[type=file]::file-selector-button {
 .dash-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
 .dc { background: #1c2128; border: 1px solid #2c343f; border-radius: 12px; padding: 12px; text-align: center; }
 .dc-n { font-size: 30px; font-weight: 900; line-height: 1; }
-.dc-l { font-family: 'Space Mono', monospace; font-size: 9px; color: #5c6775; letter-spacing: .1em; margin-top: 3px; }
+.dc-l { font-family: 'Space Mono', monospace; font-size: 9px; color: #b6c2d0; letter-spacing: .1em; margin-top: 3px; }
 
 /* ─── STRISCIA STATISTICHE PERMANENTE (sotto il menu) ─── */
 .stat-strip {
@@ -203,7 +203,7 @@ input[type=file]::file-selector-button {
 }
 .stat-strip .ss:last-child { border-right: none; }
 .stat-strip .ss-n { font-size: 18px; font-weight: 900; line-height: 1; }
-.stat-strip .ss-l { font-family: 'Space Mono', monospace; font-size: 8px; color: #5c6775; letter-spacing: .12em; margin-top: 2px; }
+.stat-strip .ss-l { font-family: 'Space Mono', monospace; font-size: 8px; color: #b6c2d0; letter-spacing: .12em; margin-top: 2px; }
 
 /* Barra invio WhatsApp / SMS sotto ogni scheda del database */
 .db-send {
@@ -223,7 +223,7 @@ input[type=file]::file-selector-button {
 .fg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
 .fg2 input, .fg2 select, input.fi, select.fi {
   background: #15181d; border: 1px solid #2c343f; border-radius: 8px;
-  padding: 10px 10px; color: #e8edf2; font-size: 13px; font-family: 'Space Mono', monospace;
+  padding: 10px 10px; color: #f2f6fa; font-size: 13px; font-family: 'Space Mono', monospace;
   outline: none; width: 100%; margin-bottom: 6px;
 }
 
@@ -246,8 +246,8 @@ input[type=file]::file-selector-button {
     <div class="logo">TANO Auto Scan <span>SISTEMA DI LETTURA TARGHE ITALIA • v4.0</span></div>
   </div>
   <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
-    <div style="font-family:monospace;font-size:10px;color:#8d99a8;background:#1c2128;border:1px solid #2c343f;border-radius:20px;padding:3px 10px;">DB <span id="hdr-db" style="color:#ff8a1e;font-weight:900">5</span></div>
-    <div style="font-family:monospace;font-size:10px;color:#8d99a8;background:#1c2128;border:1px solid #2c343f;border-radius:20px;padding:3px 10px;">SCAN <span id="hdr-scan" style="color:#ff8a1e;font-weight:900">0</span></div>
+    <div style="font-family:monospace;font-size:10px;color:#c3cddb;background:#1c2128;border:1px solid #2c343f;border-radius:20px;padding:3px 10px;">DB <span id="hdr-db" style="color:#ff8a1e;font-weight:900">5</span></div>
+    <div style="font-family:monospace;font-size:10px;color:#c3cddb;background:#1c2128;border:1px solid #2c343f;border-radius:20px;padding:3px 10px;">SCAN <span id="hdr-scan" style="color:#ff8a1e;font-weight:900">0</span></div>
   </div>
 </header>
 
@@ -286,7 +286,7 @@ input[type=file]::file-selector-button {
     <!-- GALLERIA -->
     <div class="file-wrap gal">
       <div class="file-deco">
-        <span class="ico2"><svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#8d99a8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg></span>
+        <span class="ico2"><svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#c3cddb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg></span>
         <span class="txt2">GALLERIA</span>
       </div>
       <input type="file" accept="image/*" id="inp-gal" onchange="gotFile(this)"/>
@@ -301,7 +301,7 @@ input[type=file]::file-selector-button {
       <input id="inp-manual" type="text" placeholder="Es: FA036BV" maxlength="8"
         oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
         onkeydown="if(event.key==='Enter')doManual()"/>
-      <button onclick="doManual()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8d99a8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></button>
+      <button onclick="doManual()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#c3cddb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></button>
     </div>
   </div>
 
@@ -316,7 +316,7 @@ input[type=file]::file-selector-button {
   <!-- Info spostate qui dall'ex pagina Dash (disponibili in caso di bisogno) -->
   <div class="card" style="margin-top:16px">
     <span class="lbl">🕐 SCANSIONI RECENTI</span>
-    <div id="d-hist"><span style="color:#5c6775;font-family:monospace;font-size:12px">Nessuna scansione ancora.</span></div>
+    <div id="d-hist"><span style="color:#b6c2d0;font-family:monospace;font-size:12px">Nessuna scansione ancora.</span></div>
   </div>
   <div class="card">
     <span class="lbl">⚠️ VEICOLI IN ALLERTA</span>
@@ -396,7 +396,7 @@ var ST = {
   wanted:  {label:"Ricercato",         color:"#ff5d5d",bg:"#ff5d5d14",border:"#ff5d5d33"},
   expired: {label:"Revisione Scaduta", color:"#ffab00",bg:"#ffab0014",border:"#ffab0033"},
   stolen:  {label:"Rubato",            color:"#ff5d5d",bg:"#ff5d5d1a",border:"#ff5d5d44"},
-  unknown: {label:"Non Registrato",    color:"#8d99a8",bg:"#8d99a810",border:"#8d99a830"},
+  unknown: {label:"Non Registrato",    color:"#c3cddb",bg:"#c3cddb10",border:"#c3cddb30"},
 };
 
 function stIcon(s){return {ok:"✅",wanted:"🔴",expired:"⏱️",stolen:"🚨"}[s]||"❓";}
@@ -423,35 +423,31 @@ function lisaHeaders(extra){
 window._lisaVehicle = null;
 function setLisaMsg(html, color){
   var el = document.getElementById('lisa-msg');
-  if(el){ el.innerHTML = html; el.style.color = color || '#8d99a8'; }
+  if(el){ el.innerHTML = html; el.style.color = color || '#c3cddb'; }
 }
-// Salva il veicolo scansionato nella tabella 'veicoli' del dashboard di Lisa
-async function salvaVeicoloLisa(){
+// Salva il veicolo: PRIMA nel database locale di TANOSCAN, POI nella tabella
+// 'veicoli' del dashboard di Lisa. Usato dal pulsante "Salva nel database".
+async function salvaSoloDatabase(){
   var v = window._lisaVehicle;
-  if(!v || !v.targa){ setLisaMsg('⚠️ Nessun veicolo da salvare.', '#ffab00'); return; }
-  setLisaMsg('<span class="spin">◌</span> Salvataggio nel dashboard di Lisa...', '#8d99a8');
-  var body = {
-    targa: v.targa,
-    marca: v.marca || null,
-    modello: v.modello || null,
-    cilindrata: v.cilindrata || null,
-    alimentazione: v.alimentazione || null,
-    anno: v.anno || null
-  };
+  if(!v || !v.targa){ setLisaMsg('\u26A0\uFE0F Nessun veicolo da salvare.', '#ffab00'); return; }
+  var rec = autoSaveVehicle(v, { note:'Salvato a mano da TANOSCAN' });
+  if(!rec){ setLisaMsg('\u274C Salvataggio locale non riuscito.', '#ff5d5d'); return; }
+  setLisaMsg('<span class="spin">\u25CC</span> Salvato in locale (' + db.length + ' targhe). Invio al dashboard di Lisa...', '#c3cddb');
   try{
     var res = await fetch(LISA_SUPABASE_URL + '/rest/v1/veicoli?on_conflict=targa', {
       method:'POST',
       headers: lisaHeaders({ Prefer:'resolution=merge-duplicates' }),
-      body: JSON.stringify(body)
+      body: JSON.stringify({ targa:rec.plate, marca:rec.brand||null, modello:rec.model||null,
+        cilindrata:rec.cc||null, alimentazione:rec.fuel||null, anno:rec.year||null })
     });
     if(res.ok){
-      setLisaMsg('✅ Veicolo salvato nel dashboard di Lisa.', '#3ad29f');
+      setLisaMsg('\u2705 Salvato: database locale (' + db.length + ' targhe) + dashboard di Lisa.', '#3ad29f');
     }else{
       var t = await res.text().catch(function(){return '';});
-      setLisaMsg('❌ Errore Supabase ('+res.status+'). '+(t?('— '+t.slice(0,120)):''), '#ff5d5d');
+      setLisaMsg('\u26A0\uFE0F Salvato in locale (' + db.length + ' targhe), MA errore Supabase ' + res.status + '. ' + (t?t.slice(0,110):''), '#ffab00');
     }
   }catch(e){
-    setLisaMsg('❌ Impossibile contattare il dashboard (rete?). '+e.message, '#ff5d5d');
+    setLisaMsg('\u26A0\uFE0F Salvato in locale (' + db.length + ' targhe), MA dashboard irraggiungibile (rete?).', '#ffab00');
   }
 }
 // Blocco di azioni "verso Lisa" mostrato sotto i dati del veicolo
@@ -462,6 +458,7 @@ function lisaActions(plate){
     + '<button class="btn" style="background:transparent;border:1.6px solid #ff8a1e;color:#ff8a1e;margin-bottom:8px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px" onclick="startLisaVoice()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/></svg>Prenota con Lisa (a voce)</button>'
     + '<div id="lisa-msg" style="font-family:monospace;font-size:11px;margin-bottom:8px"></div>'
     + '<button class="btn" style="background:#222933;border:1px solid #3ad29f;color:#3ad29f;margin-bottom:0" onclick="toggleApptForm()">\uD83D\uDCC5 Crea appuntamento (tastiera)</button>'
+    + '<button class="btn" style="background:#222933;border:1px solid #4aa3ff;color:#4aa3ff;margin-top:8px;margin-bottom:0" onclick="salvaSoloDatabase()">\uD83D\uDCBE Salva nel database (senza appuntamento)</button>'
     + '<div id="lisa-appt-form" style="display:none;margin-top:10px;background:#1c2128;border:1px solid #2c343f;border-radius:10px;padding:12px">'
       + '<span class="lbl">SEDE</span><select class="fi" id="la-sede" style="margin-bottom:8px"><option>Sacrofano</option><option>Borgo Pineto</option></select>'
       + '<div style="display:flex;gap:8px;margin-bottom:8px">'
@@ -483,7 +480,7 @@ function toggleApptForm(){
 }
 function setApptMsg(html, color){
   var el = document.getElementById('lisa-appt-msg');
-  if(el){ el.innerHTML = html; el.style.color = color || '#8d99a8'; }
+  if(el){ el.innerHTML = html; el.style.color = color || '#c3cddb'; }
 }
 // Crea un appuntamento nella tabella 'appuntamenti' del dashboard di Lisa
 async function creaAppuntamentoLisa(){
@@ -497,7 +494,10 @@ async function creaAppuntamentoLisa(){
   var tel  = ((document.getElementById('la-tel')||{}).value || '').trim();
   if(!targa){ setApptMsg('\u26A0\uFE0F Nessuna targa.', '#ffab00'); return; }
   if(!data || !ora){ setApptMsg('\u26A0\uFE0F Inserisci data e ora.', '#ffab00'); return; }
-  setApptMsg('<span class="spin">\u25CC</span> Creazione appuntamento...', '#8d99a8');
+  // 1) SALVATAGGIO LOCALE IMMEDIATO — non deve dipendere da Make.
+  var recLoc = autoSaveVehicle(v, { owner:nome, phone:tel,
+    note:'Appuntamento ' + data + ' ' + ora + (tipo?(' - '+tipo):'') + ' (' + sede + ')' });
+  setApptMsg('<span class="spin">\u25CC</span> Salvato nel database (' + db.length + ' targhe). Creazione appuntamento...', '#c3cddb');
   // Stesso webhook di Lisa: crea l'evento Google Calendar E scrive su Supabase.
   var body = {
     nome_cliente: nome || '',
@@ -516,14 +516,13 @@ async function creaAppuntamentoLisa(){
       body: JSON.stringify(body)
     });
     if(res.ok){
-      setApptMsg('\u2705 Appuntamento creato (calendario + dashboard di Lisa).', '#3ad29f');
-      autoSaveVehicle();
+      setApptMsg('\u2705 Salvato nel database (' + db.length + ' targhe) + appuntamento creato (calendario + dashboard di Lisa).', '#3ad29f');
     }else{
       var t = await res.text().catch(function(){return '';});
-      setApptMsg('\u274C Errore ('+res.status+'). '+(t?('\u2014 '+t.slice(0,140)):''), '#ff5d5d');
+      setApptMsg('\u26A0\uFE0F Veicolo SALVATO nel database locale, ma appuntamento NON creato \u2014 errore ' + res.status + '. ' + (t?t.slice(0,140):''), '#ff5d5d');
     }
   }catch(e){
-    setApptMsg('\u274C Impossibile contattare Make (rete?). '+e.message, '#ff5d5d');
+    setApptMsg('\u26A0\uFE0F Veicolo SALVATO nel database locale, ma Make non risponde (rete?) \u2014 appuntamento da rifare. ' + e.message, '#ff5d5d');
   }
 }
 
@@ -589,7 +588,7 @@ function readFile(file){
     var saveBtn = (lastSource === 'inp-cam')
       ? '<button class="save-gal-btn" onclick="salvaInGalleria()" style="position:absolute;bottom:8px;left:8px;background:#16a34a;border:none;border-radius:8px;color:#fff;cursor:pointer;padding:7px 12px;font-size:13px;font-weight:700;">💾 Salva in galleria</button>'
       : '';
-    z.innerHTML = '<img src="'+dataUrl+'"/><button class="clear-btn" onclick="clearImg()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.85);border:1px solid #333;border-radius:8px;color:#aaa;cursor:pointer;padding:4px 10px;font-size:12px;">✕ Cambia</button>' + saveBtn;
+    z.innerHTML = '<img src="'+dataUrl+'"/><button class="clear-btn" onclick="clearImg()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.85);border:1px solid #333;border-radius:8px;color:#d5dce6;cursor:pointer;padding:4px 10px;font-size:12px;">✕ Cambia</button>' + saveBtn;
     document.getElementById('btn-analizza').classList.add('ready');
     document.getElementById('result-area').innerHTML = '';
   };
@@ -774,7 +773,7 @@ function showResult(plate, match, loading, extData){
     return;
   }
   if(loading){
-    area.innerHTML='<div class="card fi-anim"><div class="plate-wrap"><div class="plate-eu"><span>EU</span><span class="star">★</span><span>I</span></div><div class="plate-num">'+plate+'</div></div><br><span style="color:#5c6775;font-family:monospace;font-size:12px"><span class="spin">◌</span> Ricerca dati veicolo in corso...</span></div>';
+    area.innerHTML='<div class="card fi-anim"><div class="plate-wrap"><div class="plate-eu"><span>EU</span><span class="star">★</span><span>I</span></div><div class="plate-num">'+plate+'</div></div><br><span style="color:#b6c2d0;font-family:monospace;font-size:12px"><span class="spin">◌</span> Ricerca dati veicolo in corso...</span></div>';
     return;
   }
   var st = stCfg(match?match.status:'unknown');
@@ -837,7 +836,7 @@ function showResult(plate, match, loading, extData){
   } else {
     // Targa non nel DB locale — offri ricerca PRA + condivisione
     html += '<div style="background:#1c2128;border:1px solid #2c343f;border-radius:10px;padding:14px;margin-bottom:10px;">'
-      +'<div style="font-family:monospace;font-size:11px;color:#5c6775;margin-bottom:10px;">TARGA NON NEL DATABASE LOCALE</div>'
+      +'<div style="font-family:monospace;font-size:11px;color:#b6c2d0;margin-bottom:10px;">TARGA NON NEL DATABASE LOCALE</div>'
 
       // Pulsante PRA ufficiale
       +'<a href="https://www.ilportaledellautomobilista.it/web/portale-automobilista/cerca-veicolo?targa='+plate+'" target="_blank" style="display:block;width:100%;padding:13px;background:linear-gradient(135deg,#1a3a6b,#2563eb);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:900;text-align:center;text-decoration:none;margin-bottom:8px;letter-spacing:.05em;">🏛️ Cerca sul Portale Automobilista</a>'
@@ -860,7 +859,7 @@ function showResult(plate, match, loading, extData){
 // ══════════════════════════════════════════════════════════
 function shareButtons(plate){
   return '<div style="margin-top:10px;">'
-    +'<div style="font-family:monospace;font-size:10px;color:#5c6775;letter-spacing:.15em;margin-bottom:8px;">📤 CONDIVIDI</div>'
+    +'<div style="font-family:monospace;font-size:10px;color:#b6c2d0;letter-spacing:.15em;margin-bottom:8px;">📤 CONDIVIDI</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
 
     // WhatsApp
@@ -898,7 +897,7 @@ function shareButtons(plate){
     +'<button onclick="copyInfo(\''+plate+'\')" style="'
     +'display:block;width:100%;margin-top:8px;padding:11px;'
     +'background:#1c2128;border:1px solid #2c343f;border-radius:10px;'
-    +'color:#8d99a8;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.05em;">'
+    +'color:#c3cddb;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.05em;">'
     +'📋 Copia testo completo</button>'
     +'</div>';
 }
@@ -978,7 +977,7 @@ function renderDB(){
       ||(r.owner||'').toLowerCase().includes(q)
       ||(r.brand||'').toLowerCase().includes(q);
   });
-  if(!rows.length){list.innerHTML='<p style="color:#5c6775;font-family:monospace;font-size:12px;text-align:center;padding:30px">Nessun risultato</p>';return;}
+  if(!rows.length){list.innerHTML='<p style="color:#b6c2d0;font-family:monospace;font-size:12px;text-align:center;padding:30px">Nessun risultato</p>';return;}
   list.innerHTML=rows.map(function(r){
     var st=stCfg(r.status);
     return '<div style="margin-bottom:8px">'
@@ -1022,7 +1021,7 @@ function startEdit(id){
     html+='<div><span class="lbl">'+f[0]+'</span><input class="fi" id="ef-'+f[1]+'" value="'+(r[f[1]]||'')+'"/></div>';
   });
   html+='<div><span class="lbl">STATO</span><select class="fi" id="ef-status">'
-    +'<option value="ok"'+(r.status==='ok'?' selected':'')+'">✓ Regolare</option>'
+    +'<option value="ok"'+(r.status==='ok'?' selected':'')+'>✓ Regolare</option>'
     +'<option value="wanted"'+(r.status==='wanted'?' selected':'')+'>🔴 Ricercato</option>'
     +'<option value="expired"'+(r.status==='expired'?' selected':'')+'>⏱ Scaduta</option>'
     +'<option value="stolen"'+(r.status==='stolen'?' selected':'')+'>🚨 Rubato</option>'
@@ -1060,7 +1059,7 @@ function renderDash(){
   document.getElementById('d-al').textContent=db.filter(function(r){return r.status!=='ok';}).length;
   // History
   var hl=document.getElementById('d-hist');
-  if(!scanHistory.length){hl.innerHTML='<span style="color:#5c6775;font-family:monospace;font-size:12px">Nessuna scansione ancora.</span>';return;}
+  if(!scanHistory.length){hl.innerHTML='<span style="color:#b6c2d0;font-family:monospace;font-size:12px">Nessuna scansione ancora.</span>';return;}
   hl.innerHTML=scanHistory.slice(0,8).map(function(h){
     var st=stCfg(h.match?h.match.status:'unknown');
     return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #2c343f">'
@@ -1068,7 +1067,7 @@ function renderDash(){
       +'<div style="font-family:monospace;font-size:13px;font-weight:900;color:#e8edf2;min-width:80px">'+h.plate+'</div>'
       +'<div style="flex:1"><div style="font-size:13px;font-weight:700">'+(h.match?h.match.brand+' '+h.match.model:'Non registrata')+'</div>'
       +'<div style="font-family:monospace;font-size:10px;color:'+st.color+'">'+st.label+'</div></div>'
-      +'<div style="font-family:monospace;font-size:10px;color:#5c6775">'+h.time.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})+'</div>'
+      +'<div style="font-family:monospace;font-size:10px;color:#b6c2d0">'+h.time.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})+'</div>'
       +'</div>';
   }).join('');
   // Allerta
@@ -1161,7 +1160,7 @@ function _tanoPanel(){
   p.id='tano-lisa-panel';
   p.style.cssText="position:fixed;left:14px;right:14px;bottom:14px;z-index:9999;background:#141a20;border:1px solid #ff8a1e;border-radius:14px;padding:14px 16px;box-shadow:0 10px 34px rgba(0,0,0,.5);display:none;align-items:center;gap:12px";
   p.innerHTML='<span style="width:12px;height:12px;border-radius:50%;background:#ff8a1e;flex:none"></span>'
-    +'<div style="flex:1;color:#e8edf2;font:600 14px system-ui"><div id="tano-lisa-status">In ascolto...</div><div id="tano-lisa-sub" style="font-weight:400;font-size:12px;color:#8d99a8"></div></div>'
+    +'<div style="flex:1;color:#e8edf2;font:600 14px system-ui"><div id="tano-lisa-status">In ascolto...</div><div id="tano-lisa-sub" style="font-weight:400;font-size:12px;color:#c3cddb"></div></div>'
     +'<button onclick="stopLisaVoice()" style="background:#ff5d5d;border:none;border-radius:10px;color:#fff;font-weight:700;padding:9px 14px;cursor:pointer">Chiudi</button>';
   document.body.appendChild(p);
   return p;
@@ -1201,10 +1200,20 @@ async function startLisaVoice(){
         },
         mostra_riepilogo: async function({ nome, targa, telefono, tipo, data, ora }){
           try{ mostraRiepilogo({nome:nome,targa:targa,telefono:telefono,tipo:tipo,data:data,ora:ora}); }catch(e){ console.error(e); }
-          return "Riepilogo mostrato sullo schermo di Gaspare.";
+          // SALVATAGGIO IMMEDIATO nel database locale: non aspettiamo chiudi_riepilogo,
+          // che Lisa puo' dimenticare di chiamare.
+          try{
+            var vv = {}; for(var k in (window._lisaVehicle||{})) vv[k]=window._lisaVehicle[k];
+            if(targa) vv.targa = targa;
+            window._lisaPendingAppt = { owner:nome||'', phone:telefono||'',
+              note:'Appuntamento ' + (data||'') + ' ' + (ora||'') + (tipo?(' - '+tipo):'') };
+            window._lisaPendingVeic = vv;
+            autoSaveVehicle(vv, window._lisaPendingAppt);
+          }catch(e){ console.error('salvataggio riepilogo', e); }
+          return "Riepilogo mostrato sullo schermo di Gaspare e dati salvati nel database.";
         },
         chiudi_riepilogo: async function(){
-          try{ chiudiRiepilogo(); autoSaveVehicle(); }catch(e){}
+          try{ chiudiRiepilogo(); autoSaveVehicle(window._lisaPendingVeic||window._lisaVehicle, window._lisaPendingAppt||{}); }catch(e){}
           return "Riepilogo chiuso.";
         },
         /* Qui non c'e' la scheda preventivo: lo strumento deve comunque ESISTERE,
@@ -1215,7 +1224,9 @@ async function startLisaVoice(){
       },
       onConnect:function(){ _tanoLive=true; _tanoStarting=false; if(st)st.textContent='In ascolto...';
         if(_tanoPending){ var t=_tanoPending; _tanoPending=''; setTimeout(function(){ _tanoSend(t); },400); } },
-      onDisconnect:function(){ _tanoLive=false; _tanoConv=null; if(st)st.textContent='Chiusa'; setTimeout(function(){ var p=document.getElementById('tano-lisa-panel'); if(p)p.style.display='none'; },800); },
+      onDisconnect:function(){ _tanoLive=false; _tanoConv=null; if(st)st.textContent='Chiusa';
+        /* Ultimo filet: se un riepilogo era stato mostrato, garantiamo la scrittura. */
+        try{ if(window._lisaPendingAppt){ autoSaveVehicle(window._lisaPendingVeic||window._lisaVehicle, window._lisaPendingAppt); window._lisaPendingAppt=null; window._lisaPendingVeic=null; } }catch(e){} setTimeout(function(){ var p=document.getElementById('tano-lisa-panel'); if(p)p.style.display='none'; },800); },
       onError:function(e){ console.error('Lisa TANO error',e); _tanoStarting=false; if(st)st.textContent='Errore di connessione'; },
       onMessage:function(m){ if(m&&m.message&&sub){ sub.textContent=(m.source==='user'?'Tu: ':'Lisa: ')+m.message; } }
     });
@@ -1242,38 +1253,48 @@ function mostraRiepilogo(d){
   }
   function row(lbl,val){
     return '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #232a33">'
-      +'<span style="color:#8d99a8;font-size:12px;font-family:monospace;letter-spacing:.08em">'+lbl+'</span>'
+      +'<span style="color:#c3cddb;font-size:12px;font-family:monospace;letter-spacing:.08em">'+lbl+'</span>'
       +'<span style="color:#e8edf2;font-size:16px;font-weight:800;text-align:right">'+(val&&String(val).trim()?val:'—')+'</span></div>';
   }
   el.innerHTML='<div style="width:100%;max-width:430px;background:#141a20;border:1.5px solid #ff8a1e;border-radius:18px;padding:20px 20px 22px;box-shadow:0 24px 70px rgba(0,0,0,.65)">'
     +'<div style="display:flex;align-items:center;gap:9px;margin-bottom:14px"><span style="width:11px;height:11px;border-radius:50%;background:#ff8a1e;box-shadow:0 0 12px #ff8a1e"></span><span style="color:#ff8a1e;font-weight:900;font-size:15px;letter-spacing:.05em">RIEPILOGO APPUNTAMENTO</span></div>'
     +row('CLIENTE', d.nome)+row('TARGA', d.targa)+row('TELEFONO', d.telefono)+row('INTERVENTO', d.tipo)+row('DATA', d.data)+row('ORA', d.ora)
-    +'<div style="margin-top:16px;text-align:center;color:#8d99a8;font-size:13px">Conferma a voce a Lisa per registrare</div>'
+    +'<div style="margin-top:16px;text-align:center;color:#c3cddb;font-size:13px">Conferma a voce a Lisa per registrare</div>'
     +'</div>';
   el.style.display='flex';
 }
 function chiudiRiepilogo(){ var el=document.getElementById('tano-riepilogo'); if(el) el.style.display='none'; }
-function autoSaveVehicle(v){
+function autoSaveVehicle(v, extra){
   try{
     v = v || window._lisaVehicle || {};
+    extra = extra || {};
     var plate=(v.targa||v.plate||'').toString().toUpperCase().replace(/[\s\-.]/g,'');
-    if(!plate) return;
+    if(!plate) return null;
     var ex=db.find(function(r){return norm(r.plate)===norm(plate);});
     if(ex){
       if(!ex.brand && (v.marca||v.brand)) ex.brand=v.marca||v.brand;
       if(!ex.model && (v.modello||v.model)) ex.model=v.modello||v.model;
-      if(!ex.year && (v.anno||v.year)) ex.year=v.anno||v.year;
+      if(!ex.year  && (v.anno||v.year))    ex.year =v.anno||v.year;
+      if(!ex.cc    && (v.cilindrata||v.cc))ex.cc   =v.cilindrata||v.cc;
+      if(!ex.fuel  && (v.alimentazione||v.fuel)) ex.fuel=v.alimentazione||v.fuel;
+      if(extra.owner) ex.owner=extra.owner;
+      if(extra.phone) ex.phone=extra.phone;
+      if(extra.note)  ex.note =extra.note;
     } else {
-      db.push({ id:nextId++, plate:plate, owner:v.owner||'', phone:v.phone||'',
+      ex = { id:nextId++, plate:plate, owner:extra.owner||v.owner||'', phone:extra.phone||v.phone||'',
         brand:v.marca||v.brand||'', model:v.modello||v.model||'', year:v.anno||v.year||'',
         color:v.color||'', fuel:v.alimentazione||v.fuel||'', hp:v.hp||'',
         cc:v.cilindrata||v.cc||'', oil:'', battery:'', tires:'', revision:'',
-        status:'ok', note:'Salvato da appuntamento' });
+        status:'ok', note:extra.note||'Salvato da TANOSCAN' };
+      db.push(ex);
     }
     saveDB();
     try{ renderDB(); }catch(e){}
+    try{ renderDash(); }catch(e){}
     try{ document.getElementById('hdr-db').textContent=db.length; }catch(e){}
-  }catch(e){ console.error('autoSaveVehicle', e); }
+    console.log('[TANOSCAN] scritto nel database locale:', JSON.stringify(ex));
+    return ex;
+  }catch(e){ console.error('autoSaveVehicle', e); return null; }
 }
 function startLisaVoiceForPlate(plate){
   var r=db.find(function(x){return norm(x.plate)===norm(plate);});
