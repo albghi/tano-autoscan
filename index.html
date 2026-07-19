@@ -1206,6 +1206,11 @@ async function startLisaVoice(){
         chiudi_riepilogo: async function(){
           try{ chiudiRiepilogo(); autoSaveVehicle(); }catch(e){}
           return "Riepilogo chiuso.";
+        },
+        /* Qui non c'e' la scheda preventivo: lo strumento deve comunque ESISTERE,
+           altrimenti la sessione con l'agente si chiude alla connessione. */
+        apri_preventivo: async function(){
+          return "Il preventivo e' salvato. Su TANOSCAN non posso mostrarlo: aprilo dalla dashboard, sezione Preventivi.";
         }
       },
       onConnect:function(){ _tanoLive=true; _tanoStarting=false; if(st)st.textContent='In ascolto...';
