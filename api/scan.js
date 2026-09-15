@@ -6,7 +6,90 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   try {
-    const { image_base64, image_mime, plate, libretto } = req.body;
+    const { image_base64, image_mime, plate, libretto, foto, domanda } = req.body;
+
+    // Pulizia dei due campi che si sporcano piu' spesso.
+    // "1598 cm3" -> 1598 (non 15983) ; "15/03/2015" -> 2015 (non 1503).
+    const soloCilindrata = v => { const m = String(v == null ? '' : v).replace(/[.\s']/g, '').match(/\d{3,5}/); return m ? m[0] : ''; };
+    const soloAnno       = v => { const m = String(v == null ? '' : v).match(/(?:19|20)\d{2}/); return m ? m[0] : ''; };
+
+    // MODE 4: FOTO APERTA — la dashboard manda una foto qualsiasi (+ eventuale domanda).
+    // Se e' una carta di circolazione risponde come il MODE 3 ({ tipo:'libretto', libretto:{...} }),
+    // altrimenti risponde a parole ({ tipo:'aperto', risposta:'...' }).
+    // Non tocca gli altri modi: si attiva solo quando arriva il flag "foto".
+    if (image_base64 && foto) {
+      const chiesto = (domanda == null ? '' : String(domanda)).trim().slice(0, 600);
+
+      const istruzioni =
+        "Sei l'assistente di un'officina meccanica italiana (Officina Tano Evoluzione). " +
+        "Guardi le foto che ti manda il meccanico dal telefono: libretti, pezzi usurati, schermate di diagnosi Texa o Autel, " +
+        "codici errore, parti del motore, targhe, documenti. " +
+        "Rispondi SEMPRE e SOLO con un JSON grezzo, senza backtick e senza la parola json.\n\n" +
+        "CASO 1 — se la foto e' una carta di circolazione italiana (libretto), usa questo formato esatto:\n" +
+        '{"tipo":"libretto","targa":"","marca":"","modello":"","cilindrata":"","alimentazione":"","anno":"","telaio":""}\n' +
+        "Regole: targa = campo (A) in maiuscolo senza spazi; marca = campo (D.1); modello = campo (D.3); " +
+        "cilindrata = campo (P.1), solo il numero in cm3; alimentazione = campo (P.3) (es. BENZINA, DIESEL, IBRIDO, GPL, METANO, ELETTRICO); " +
+        "anno = anno della prima immatricolazione, campo (B) oppure (I), solo le 4 cifre; telaio = campo (E). " +
+        "Se un dato non e' leggibile metti stringa vuota.\n\n" +
+        "CASO 2 — in tutti gli altri casi usa questo formato:\n" +
+        '{"tipo":"aperto","risposta":"..."}\n' +
+        "Dentro risposta scrivi in italiano, parlando al meccanico da collega: di' cosa vedi di concreto e utile, " +
+        "leggi i codici, le sigle e i numeri se ci sono, e se serve di' cosa controlleresti dopo. " +
+        "Da 2 a 6 frasi, niente elenchi puntati, niente premesse. " +
+        "Se la foto e' poco leggibile dillo e spiega come rifarla. " +
+        "Non inventare mai un dato che non si vede: se non sei sicuro, dillo.";
+
+      const testo = chiesto
+        ? (istruzioni + "\n\nDomanda del meccanico su questa foto: " + chiesto)
+        : istruzioni;
+
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-5',
+          max_tokens: 900,
+          messages: [{ role: 'user', content: [
+            { type: 'image', source: { type: 'base64', media_type: image_mime || 'image/jpeg', data: image_base64 }},
+            { type: 'text', text: testo }
+          ]}]
+        })
+      });
+      const data = await response.json();
+      if (data.error) return res.status(400).json({ error: 'IA (foto): ' + data.error.message });
+
+      const textBlock = (data.content || []).find(b => b.type === 'text');
+      let txt = (textBlock?.text || '').trim();
+      txt = txt.replace(/^```json/i, '').replace(/^```/, '').replace(/```$/, '').trim();
+
+      const S = v => (v == null ? '' : String(v)).trim();
+
+      let out = null;
+      try { out = JSON.parse(txt); } catch (e) { out = null; }
+
+      // Se il modello non ha risposto in JSON, il testo vale come risposta aperta.
+      if (!out || typeof out !== 'object') {
+        return res.status(200).json({ tipo: 'aperto', risposta: txt || 'Non riesco a leggere questa foto.' });
+      }
+
+      if (out.tipo === 'libretto') {
+        return res.status(200).json({ tipo: 'libretto', libretto: {
+          targa:         S(out.targa).toUpperCase().replace(/[^A-Z0-9]/g, ''),
+          marca:         S(out.marca),
+          modello:       S(out.modello),
+          cilindrata:    soloCilindrata(out.cilindrata),
+          alimentazione: S(out.alimentazione),
+          anno:          soloAnno(out.anno),
+          telaio:        S(out.telaio).toUpperCase().replace(/[^A-Z0-9]/g, '')
+        }});
+      }
+
+      return res.status(200).json({ tipo: 'aperto', risposta: S(out.risposta) || 'Non riesco a leggere questa foto.' });
+    }
 
     // MODE 3: Lettura COMPLETA del libretto di circolazione (carta di circolazione)
     // Usato dalla dashboard di Lisa per il preventivo. Ritorna { libretto: {...} }.
@@ -49,9 +132,9 @@ export default async function handler(req, res) {
         targa:         S(lib.targa).toUpperCase().replace(/[^A-Z0-9]/g, ''),
         marca:         S(lib.marca),
         modello:       S(lib.modello),
-        cilindrata:    S(lib.cilindrata).replace(/[^0-9]/g, ''),
+        cilindrata:    soloCilindrata(lib.cilindrata),
         alimentazione: S(lib.alimentazione),
-        anno:          S(lib.anno).replace(/[^0-9]/g, '').slice(0, 4),
+        anno:          soloAnno(lib.anno),
         telaio:        S(lib.telaio).toUpperCase().replace(/[^A-Z0-9]/g, '')
       }});
     }
