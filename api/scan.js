@@ -1,3 +1,5 @@
+// v2 (24/09/2026): legge anche l'intestatario (C.3 oppure C.2.2 + C.2.1) per il preventivo
+function nomeProprio(v){ const t=(v==null?'':String(v)).replace(/\s+/g,' ').trim(); return t.toLowerCase().replace(/(^|[\s'-])([a-zà-ù])/g,(m,a,b)=>a+b.toUpperCase()); }
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -26,10 +28,11 @@ export default async function handler(req, res) {
         "codici errore, parti del motore, targhe, documenti. " +
         "Rispondi SEMPRE e SOLO con un JSON grezzo, senza backtick e senza la parola json.\n\n" +
         "CASO 1 — se la foto e' una carta di circolazione italiana (libretto), usa questo formato esatto:\n" +
-        '{"tipo":"libretto","targa":"","marca":"","modello":"","cilindrata":"","alimentazione":"","anno":"","telaio":""}\n' +
+        '{"tipo":"libretto","targa":"","marca":"","modello":"","cilindrata":"","alimentazione":"","anno":"","telaio":"","intestatario":""}\n' +
         "Regole: targa = campo (A) in maiuscolo senza spazi; marca = campo (D.1); modello = campo (D.3); " +
         "cilindrata = campo (P.1), solo il numero in cm3; alimentazione = campo (P.3) (es. BENZINA, DIESEL, IBRIDO, GPL, METANO, ELETTRICO); " +
         "anno = anno della prima immatricolazione, campo (B) oppure (I), solo le 4 cifre; telaio = campo (E). " +
+        "intestatario = nome e cognome della persona intestataria: se c'e' il campo (C.3) usa quello (locatario/usufruttuario), altrimenti campo (C.2.2) nome seguito da campo (C.2.1) cognome, es. 'Tatiana Bizgu'; se l'intestatario e' una societa' metti la ragione sociale (C.2.1). Non mettere mai data o luogo di nascita, codice fiscale o indirizzo. " +
         "Se un dato non e' leggibile metti stringa vuota.\n\n" +
         "CASO 2 — in tutti gli altri casi usa questo formato:\n" +
         '{"tipo":"aperto","risposta":"..."}\n' +
@@ -84,7 +87,8 @@ export default async function handler(req, res) {
           cilindrata:    soloCilindrata(out.cilindrata),
           alimentazione: S(out.alimentazione),
           anno:          soloAnno(out.anno),
-          telaio:        S(out.telaio).toUpperCase().replace(/[^A-Z0-9]/g, '')
+          telaio:        S(out.telaio).toUpperCase().replace(/[^A-Z0-9]/g, ''),
+          intestatario:  nomeProprio(out.intestatario)
         }});
       }
 
@@ -108,10 +112,11 @@ export default async function handler(req, res) {
             { type: 'image', source: { type: 'base64', media_type: image_mime || 'image/jpeg', data: image_base64 }},
             { type: 'text', text:
               "Questa e' una carta di circolazione italiana (libretto). Leggi i dati del veicolo e rispondi SOLO con un JSON grezzo, " +
-              "senza backtick e senza la parola json, con queste chiavi esatte: targa, marca, modello, cilindrata, alimentazione, anno, telaio. " +
+              "senza backtick e senza la parola json, con queste chiavi esatte: targa, marca, modello, cilindrata, alimentazione, anno, telaio, intestatario. " +
               "Regole: targa = campo (A) in maiuscolo senza spazi; marca = campo (D.1); modello = campo (D.3); " +
               "cilindrata = campo (P.1), solo il numero in cm3; alimentazione = campo (P.3) (es. BENZINA, DIESEL, IBRIDO, GPL, METANO, ELETTRICO); " +
               "anno = anno della prima immatricolazione, campo (B) oppure (I), solo le 4 cifre; telaio = campo (E). " +
+              "intestatario = nome e cognome della persona intestataria: se c'e' il campo (C.3) usa quello (locatario/usufruttuario), altrimenti campo (C.2.2) nome seguito da campo (C.2.1) cognome, es. 'Tatiana Bizgu'; se l'intestatario e' una societa' metti la ragione sociale (C.2.1). Non mettere mai data o luogo di nascita, codice fiscale o indirizzo. " +
               "Se un dato non e' leggibile metti stringa vuota." }
           ]}]
         })
@@ -135,7 +140,8 @@ export default async function handler(req, res) {
         cilindrata:    soloCilindrata(lib.cilindrata),
         alimentazione: S(lib.alimentazione),
         anno:          soloAnno(lib.anno),
-        telaio:        S(lib.telaio).toUpperCase().replace(/[^A-Z0-9]/g, '')
+        telaio:        S(lib.telaio).toUpperCase().replace(/[^A-Z0-9]/g, ''),
+        intestatario:  nomeProprio(lib.intestatario)
       }});
     }
 
